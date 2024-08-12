@@ -1,0 +1,18 @@
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSaveMode": "file",
+  "files.autoSave": "afterDelay",
+  "ghoster.ignore": [
+    "typescript",
+    "eslint",
+    "prettier",
+    "@typescript-eslint/eslint-plugin",
+    "@typescript-eslint/parser",
+    "react-dom",
+    "tailwindcss-animate"
+  ]
+}
