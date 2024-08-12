@@ -27,7 +27,6 @@ function isTowerAvailable(tower) {
   const utcHour = now.getUTCHours();
   const utcMinute = now.getUTCMinutes();
 
-  // Convertir reset_hour a un objeto Date para fácil comparación
   const [resetHour, resetMinute] = tower.reset_hour.split(":").map(Number);
   const resetDate = new Date(
     Date.UTC(
@@ -49,17 +48,14 @@ function isTowerAvailable(tower) {
     "Saturday",
   ];
 
-  // Regla especial para los sábados
   if (utcDay === 6) return true;
 
-  // Verificar disponibilidad en el día actual
   if (tower.available_days.includes(daysOfWeek[utcDay])) {
     if (now >= resetDate) {
       return true;
     }
   }
 
-  // Verificar disponibilidad en el día anterior si ahora es antes de la hora de reinicio
   const yesterdayIndex = (utcDay - 1 + 7) % 7;
   if (tower.available_days.includes(daysOfWeek[yesterdayIndex])) {
     if (now < resetDate) {
