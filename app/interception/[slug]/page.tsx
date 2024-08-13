@@ -13,15 +13,16 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import InterceptionTeamList from "@/components/interception/interception-team-list";
-import InterceptionSubmitTeam from "@/components/interception/interception-submit-team";
+import InterceptionSubmitTeamModal from "@/components/interception/interception-submit-team-modal";
 
 type Boss = Database["bosses"];
 type InterceptionTeam = Database["interception_teams_with_votes"];
+type GameVersion = Database["game_versions"];
 
 async function fetchBossData(slug: string): Promise<{
   boss: Boss | null;
   teams: InterceptionTeam[];
-  versions: Database["game_versions"][];
+  versions: GameVersion[];
 }> {
   const supabase = createClient();
 
@@ -102,15 +103,16 @@ export default async function InterceptionBossPage({
       <Card className="container mx-auto w-full p-0">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle>Teams</CardTitle>
-          <InterceptionSubmitTeam bossId={boss.id} versions={versions} />
+          <InterceptionSubmitTeamModal
+            modeId={boss.mode_id || ""}
+            modeName="Interception"
+            bosses={[boss]}
+            versions={versions}
+          />
         </CardHeader>
         <CardContent className="p-4 pt-0 xl:p-6">
           <Suspense fallback={<Loading />}>
-            <InterceptionTeamList
-              initialTeams={teams}
-              versions={versions}
-              boss={boss}
-            />
+            <InterceptionTeamList initialTeams={teams} versions={versions} />
           </Suspense>
         </CardContent>
       </Card>
