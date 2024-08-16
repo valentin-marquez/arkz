@@ -19,23 +19,6 @@ import Image from "next/image";
 import { Database } from "@/lib/types/database.types";
 import { motion } from "framer-motion";
 
-const elementsImages = {
-  Iron: "/images/element/element_iron.webp",
-  Electric: "/images/element/element_electric.webp",
-  Fire: "/images/element/element_fire.webp",
-  Wind: "/images/element/element_wind.webp",
-  Water: "/images/element/element_water.webp",
-};
-
-const weaponTypeImages = {
-  AR: "/images/weapons/weapon_ar.webp",
-  MG: "/images/weapons/weapon_mg.webp",
-  SMG: "/images/weapons/weapon_smg.webp",
-  SG: "/images/weapons/weapon_sg.webp",
-  RL: "/images/weapons/weapon_rl.webp",
-  SR: "/images/weapons/weapon_sr.webp",
-};
-
 const rarities: Rarity[] = ["R", "SR", "SSR"];
 const elements: Element[] = ["Iron", "Electric", "Fire", "Wind", "Water"];
 const weaponTypes: WeaponType[] = ["AR", "MG", "SMG", "SG", "RL", "SR"];
@@ -146,7 +129,7 @@ export default function CharacterContainer({
                     }
                   >
                     <Image
-                      src={elementsImages[element]}
+                      src={`/images/element/element_${element.toLowerCase()}.webp`}
                       alt={element}
                       width={16}
                       height={16}
@@ -173,7 +156,7 @@ export default function CharacterContainer({
                     }
                   >
                     <Image
-                      src={weaponTypeImages[weaponType]}
+                      src={`/images/weapons/weapon_${weaponType.toLowerCase()}.webp`}
                       alt={weaponType}
                       width={24}
                       height={24}
