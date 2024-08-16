@@ -50,8 +50,8 @@ const sidebarOptions: SidebarOption[] = [
   { icon: BookOpen, label: "Story", href: "/story" },
   { icon: Castle, label: "Tribe Tower", href: "/tribe" },
   { icon: Target, label: "Interception", href: "/interception" },
-  { icon: Swords, label: "Solo Raid", href: "/solo-raid" },
-  { icon: Users, label: "Special Arena", href: "/special-arena" },
+  // { icon: Swords, label: "Solo Raid", href: "/solo-raid" },
+  // { icon: Users, label: "Special Arena", href: "/special-arena" },
   { icon: Settings, label: "Settings", href: "/settings", separator: true },
   { icon: HelpCircle, label: "Support", href: "/help" },
 ];
