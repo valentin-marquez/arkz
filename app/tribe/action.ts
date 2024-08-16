@@ -83,14 +83,16 @@ export async function submitTribeTowerTeam(
       };
     }
 
-    const { data, error } = await supabase.rpc("submit_tribe_tower_team", {
-      p_user_id: submission.userId,
-      p_tower_id: submission.towerId,
-      p_floor: submission.floor,
-      p_game_version_id: submission.gameVersionId,
-      p_comment: submission.comment,
-      p_nikkes: submission.nikkes,
-    });
+    const { data, error } = await supabase
+      .rpc("submit_tribe_tower_team", {
+        p_user_id: submission.userId,
+        p_tower_id: submission.towerId,
+        p_floor: submission.floor,
+        p_game_version_id: submission.gameVersionId,
+        p_comment: submission.comment || "",
+        p_nikkes: submission.nikkes,
+      })
+      .single();
 
     if (error) {
       console.error("Error submitting tribe tower team:", error);

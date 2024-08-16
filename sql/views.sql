@@ -201,3 +201,23 @@ group by
   tt.manufacturer,
   p.username,
   p.avatar_url;
+
+
+  CREATE VIEW public.tribe_tower_team_nikke_details AS
+SELECT
+  tttn.id AS team_nikke_id,
+  tttn.team_id,
+  tttn.nikke_id,
+  tttn.position,
+  n.name,
+  n.slug,
+  n.icon_url,
+  n.full_image_url,
+  n.rarity,
+  n.element,
+  n.weapon_type,
+  n.burst,
+  n.manufacturer
+FROM
+  tribe_tower_team_nikkes tttn
+  JOIN nikkes n ON tttn.nikke_id = n.id;

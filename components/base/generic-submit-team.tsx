@@ -13,15 +13,23 @@ import { createClient } from "@/lib/supabase/client";
 import { getMediaURL } from "@/lib/supabase/utils";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
+import { Tables } from "@/lib/types/database.types";
 
 interface GenericSubmitTeamProps<T> {
   numberOfTeams: number;
-  versions: { id: string; version: string }[];
+  versions: Tables<"game_versions">[];
   allowCharacterRepeat: boolean;
-  characters: T[];
-  renderCharacterCard: (character: T, onClick: () => void) => React.ReactNode;
-  getCharacterId: (character: T) => string;
-  onSubmit: (teams: T[][], comment: string, version: string) => Promise<void>;
+  characters: Tables<"nikkes">[];
+  renderCharacterCard: (
+    character: Tables<"nikkes">,
+    onClick: () => void
+  ) => React.ReactNode;
+  getCharacterId: (character: Tables<"nikkes">) => string;
+  onSubmit: (
+    teams: Tables<"nikkes">[][],
+    comment: string,
+    version: string
+  ) => Promise<void>;
   onClose: () => void;
 }
 
@@ -82,7 +90,7 @@ export default function GenericSubmitTeam<T>({
     setFilter(searchTerm);
   }, [searchTerm, setFilter]);
 
-  const handleAddToTeam = (character: T) => {
+  const handleAddToTeam = (character: (typeof characters)[0]) => {
     const emptySlotIndex = teams[activeTeam].findIndex((slot) => slot === null);
     if (emptySlotIndex !== -1) {
       addNikkeToTeam(character, activeTeam, emptySlotIndex);
@@ -96,7 +104,7 @@ export default function GenericSubmitTeam<T>({
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      await onSubmit(teams, comment, selectedVersion);
+      await onSubmit(teams as Tables<"nikkes">[][], comment, selectedVersion);
       onClose();
     } catch (error) {
       console.error("Error submitting team:", error);

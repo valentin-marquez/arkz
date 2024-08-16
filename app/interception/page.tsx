@@ -1,9 +1,7 @@
 import React from "react";
 import { createClient } from "@/lib/supabase/server";
-import { Database } from "@/lib/types/database.types";
 import InterceptionBossList from "@/components/interception/interception-boss-list";
-
-type Boss = Database["bosses"];
+import { Tables } from "@/lib/types/database.types";
 
 export default async function InterceptionPage() {
   const supabase = createClient();
@@ -19,7 +17,7 @@ export default async function InterceptionPage() {
       <h1 className="text-4xl font-bold text-center mb-12 text-primary">
         Interception Bosses
       </h1>
-      <InterceptionBossList initialBosses={bosses || []} />
+      <InterceptionBossList initialBosses={bosses as Tables<"bosses">[]} />
     </div>
   );
 }

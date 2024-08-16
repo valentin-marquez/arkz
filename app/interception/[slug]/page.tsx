@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
-import { Database } from "@/lib/types/database.types";
 import Loading from "@/components/ui/loading";
 import {
   Breadcrumb,
@@ -14,42 +13,63 @@ import {
 import { Separator } from "@/components/ui/separator";
 import InterceptionTeamList from "@/components/interception/interception-team-list";
 import InterceptionSubmitTeamModal from "@/components/interception/interception-submit-team-modal";
-
-type Boss = Database["bosses"];
-type InterceptionTeam = Database["interception_teams_with_votes"];
-type GameVersion = Database["game_versions"];
+import { Tables } from "@/lib/types/database.types";
 
 async function fetchBossData(slug: string): Promise<{
-  boss: Boss | null;
-  teams: InterceptionTeam[];
-  versions: GameVersion[];
+  boss: Tables<"bosses"> | null;
+  teams: any[];
+  versions: Tables<"game_versions">[] | [];
 }> {
   const supabase = createClient();
 
+  // Fetch the boss data
   const { data: boss, error: bossError } = await supabase
     .from("bosses")
     .select("*")
     .eq("slug", slug)
     .single();
 
+  if (bossError) throw bossError;
+
+  // Fetch the teams and associated Nikke details
   const { data: teams, error: teamsError } = await supabase
     .from("interception_teams_with_votes_and_boss")
     .select("*")
     .eq("slug", slug);
 
+  console.log("teams", teams);
+
+  if (teamsError) throw teamsError;
+
+  const teamsWithNikkes = await Promise.all(
+    (teams || []).map(async (team) => {
+      if (!team.team_id) return team;
+
+      const { data: nikkes, error: nikkesError } = await supabase
+        .from("interception_team_nikke_details")
+        .select("*")
+        .eq("team_id", team.team_id);
+
+      if (nikkesError) throw nikkesError;
+
+      return { ...team, nikkes: nikkes || [] };
+    })
+  );
+
+  console.log("teamsWithNikkes", teamsWithNikkes);
+
+  // Fetch the game versions
   const { data: versions, error: versionsError } = await supabase
     .from("game_versions")
     .select("*")
     .order("release_date", { ascending: false });
 
-  if (bossError || teamsError || versionsError) {
-    throw new Error("Error fetching data");
-  }
+  if (versionsError) throw versionsError;
 
   return {
-    boss: boss || null,
-    teams: teams || [],
-    versions: versions || [],
+    boss: (boss as Tables<"bosses">) || null,
+    teams: teamsWithNikkes,
+    versions: (versions as Tables<"game_versions">[]) || [],
   };
 }
 
@@ -60,6 +80,10 @@ export default async function InterceptionBossPage({
 }) {
   const { slug } = params;
   const { boss, teams, versions } = await fetchBossData(slug);
+
+  console.log("boss", boss);
+  console.log("teams", teams);
+  console.log("versions", versions);
 
   if (!boss) {
     return <div>Boss not found.</div>;
@@ -106,13 +130,17 @@ export default async function InterceptionBossPage({
           <InterceptionSubmitTeamModal
             modeId={boss.mode_id || ""}
             modeName="Interception"
-            bosses={[boss]}
+            boss={boss}
             versions={versions}
           />
         </CardHeader>
         <CardContent className="p-4 pt-0 xl:p-6">
           <Suspense fallback={<Loading />}>
-            <InterceptionTeamList initialTeams={teams} versions={versions} />
+            <InterceptionTeamList
+              initialTeams={teams}
+              versions={versions}
+              boss={boss}
+            />
           </Suspense>
         </CardContent>
       </Card>

@@ -11,15 +11,19 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/server";
-import { Database, GameVersion } from "@/lib/types/database.types";
 import Loading from "@/components/ui/loading";
-import type { ChapterData, TeamWithNikkes } from "@/lib/types";
 import StorySubmitTeamModal from "@/components/story/story-submit-team-modal";
+import { Tables } from "@/lib/types/database.types";
 
 async function fetchChapterData(
   difficulty: string,
   chapter: string
-): Promise<ChapterData> {
+): Promise<{
+  chapter: Tables<"chapters">;
+  teams: any[];
+  versions: Tables<"game_versions">[];
+  mode: Tables<"modes">;
+}> {
   const supabase = createClient();
   const chapterNumber = parseInt(chapter);
 
@@ -40,8 +44,10 @@ async function fetchChapterData(
 
   if (teamsError) throw teamsError;
 
-  const teamsWithNikkes: TeamWithNikkes[] = await Promise.all(
+  const teamsWithNikkes = await Promise.all(
     (teamsWithVotes || []).map(async (team) => {
+      if (!team.team_id) return team;
+
       const { data: nikkes, error: nikkesError } = await supabase
         .from("team_nikke_details")
         .select("*")
@@ -69,10 +75,10 @@ async function fetchChapterData(
   if (modeError || !modeData) throw modeError;
 
   return {
-    chapter: chapterData,
+    chapter: (chapterData as Tables<"chapters">) || {},
     teams: teamsWithNikkes,
-    versions: versions || [],
-    mode: modeData,
+    versions: (versions as Tables<"game_versions">[]) || [],
+    mode: modeData as Tables<"modes">,
   };
 }
 
@@ -83,8 +89,6 @@ export default async function Page({
 }) {
   const { difficulty, chapter } = params;
   const data = await fetchChapterData(difficulty, chapter);
-
-  console.log(data.teams);
 
   return (
     <main className="flex-1 relative space-y-4">

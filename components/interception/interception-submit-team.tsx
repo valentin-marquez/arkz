@@ -6,26 +6,24 @@ import { useAuth } from "@/providers/auth-provider";
 import { submitInterceptionTeam } from "@/app/interception/actions";
 import GenericSubmitTeam from "@/components/base/generic-submit-team";
 import CharacterCard from "@/components/character-card";
-import { Database } from "@/lib/types/database.types";
 import { z } from "zod";
 import { toast } from "@/components/ui/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import { InterceptionTeamSubmissionSchema } from "@/lib/types/zod";
-
-type Nikke = Database["nikkes"];
-type Boss = Database["bosses"];
+import { Tables } from "@/lib/types/database.types";
 
 interface InterceptionSubmitTeamProps {
   modeId: string;
   modeName: string;
-  bosses: Boss[];
-  versions: Database["game_versions"][];
+  boss: Tables<"bosses">;
+  versions: Tables<"game_versions">[];
   onClose: () => void;
 }
 
 export default function InterceptionSubmitTeam({
   modeId,
   modeName,
-  bosses,
+  boss,
   versions,
   onClose,
 }: InterceptionSubmitTeamProps) {
@@ -44,7 +42,7 @@ export default function InterceptionSubmitTeam({
           variant: "destructive",
         });
       } else {
-        setCharacters(data as Nikke[]);
+        setCharacters(data);
       }
     };
 
@@ -52,10 +50,9 @@ export default function InterceptionSubmitTeam({
   }, [setCharacters, supabase]);
 
   const handleSubmit = async (
-    team: Nikke[],
+    teams: Tables<"nikkes">[][],
     comment: string,
-    gameVersionId: string,
-    bossId: string
+    gameVersionId: string
   ) => {
     if (!user) {
       toast({
@@ -67,47 +64,67 @@ export default function InterceptionSubmitTeam({
     }
 
     try {
-      const nikkes = team.map((nikke, index) => ({
-        id: nikke.id,
-        position: index + 1,
-      }));
+      for (let i = 0; i < teams.length; i++) {
+        const nikkes = teams[i].map((nikke, index) => ({
+          id: nikke.id,
+          position: index + 1,
+        }));
 
-      const validatedData = InterceptionTeamSubmissionSchema.parse({
-        userId: user.id,
-        modeId,
-        bossId,
-        gameVersionId,
-        comment,
-        nikkes,
-      });
-
-      const result = await submitInterceptionTeam(validatedData);
-
-      if (result.status === "error") {
-        toast({
-          title: "Error",
-          description: result.message,
-          variant: "destructive",
+        const validatedData = InterceptionTeamSubmissionSchema.parse({
+          userId: user.id,
+          modeId,
+          bossId: boss.id,
+          gameVersionId,
+          comment,
+          nikkes,
         });
-        return;
-      }
 
-      if (result.status === "success") {
-        toast({
-          title: "Success",
-          description:
-            "Your Interception team has been successfully submitted! Ready to take on the boss! 🎉👍",
-        });
-        onClose();
+        const result = await submitInterceptionTeam(validatedData);
+
+        if (result.status === "error") {
+          toast({
+            title: "Error",
+            description: result.message,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (result.status === "success") {
+          teams[i] = [];
+          toast({
+            title: result.status,
+            description: result.message,
+          });
+        }
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        error.errors.forEach((err) => {
-          toast({
-            title: "Validation Error",
-            description: `Oops! There's an issue with your team data: ${err.message}. Can you double-check and try again? 🕵️‍♀️`,
-            variant: "destructive",
-          });
+        console.log("Validation error:", error.errors);
+        toast({
+          title: "Validation Error",
+          description: `Oops! There's an issue with your team data. Can you double-check and try again? 🕵️‍♀️`,
+          variant: "destructive",
+          action: (
+            <ToastAction
+              altText="Copy errors to clipboard"
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  error.errors.map((err) => err.message).join("\n")
+                );
+                toast({
+                  title: "Copied to clipboard",
+                  description: "The errors have been copied to your clipboard.",
+                });
+              }}
+            />
+          ),
+        });
+      } else if (error instanceof Error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
         });
       } else {
         toast({
@@ -132,7 +149,6 @@ export default function InterceptionSubmitTeam({
       getCharacterId={(character) => character.id}
       onSubmit={handleSubmit}
       onClose={onClose}
-      bosses={bosses}
     />
   );
 }

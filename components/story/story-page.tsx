@@ -9,10 +9,10 @@ import { Filters } from "./filters";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useStoryStore } from "@/lib/store/story-store";
 import { useInView } from "react-intersection-observer";
-import { Chapter } from "@/lib/types";
+import { Tables } from "@/lib/types/database.types";
 
 interface StoryPageClientProps {
-  initialChapters: Chapter[];
+  initialChapters: Tables<"chapters">[];
 }
 
 export const StoryPageClient: React.FC<StoryPageClientProps> = ({

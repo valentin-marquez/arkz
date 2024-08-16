@@ -1,17 +1,17 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { Database } from "@/lib/types/database.types";
 import { z } from "zod";
 import {
   InterceptionTeamSubmissionSchema,
   InterceptionTeamSubmission,
 } from "@/lib/types/zod";
+import { Tables } from "@/lib/types/supabase";
 
 export async function getBosses(): Promise<{
   status: string;
   message?: string;
-  data?: Database["bosses"][];
+  data?: Tables<"bosses">[];
 }> {
   const supabase = createClient();
 
@@ -24,7 +24,10 @@ export async function getBosses(): Promise<{
     return { status: "error", message: error.message };
   }
 
-  return { status: "success", data: data };
+  return {
+    status: "success",
+    data: data as Tables<"bosses">[],
+  };
 }
 
 export async function submitInterceptionTeam(
@@ -35,6 +38,8 @@ export async function submitInterceptionTeam(
   data?: { teamId: string };
 }> {
   const supabase = createClient();
+
+  console.log("Received submission data:", JSON.stringify(submission, null, 2));
 
   try {
     // Validate the submission data
@@ -51,14 +56,18 @@ export async function submitInterceptionTeam(
       };
     }
 
-    const { data, error } = await supabase.rpc("submit_interception_team", {
-      p_user_id: submission.userId,
-      p_mode_id: submission.modeId,
-      p_boss_id: submission.bossId,
-      p_game_version_id: submission.gameVersionId,
-      p_comment: submission.comment ?? "",
-      p_nikkes: submission.nikkes,
-    });
+    const { data, error } = await supabase
+      .rpc("submit_interception_team", {
+        p_user_id: submission.userId,
+        p_mode_id: submission.modeId,
+        p_boss_id: submission.bossId,
+        p_game_version_id: submission.gameVersionId,
+        p_comment: submission.comment ?? "",
+        p_nikkes: submission.nikkes,
+      })
+      .single();
+
+    console.log("submitInterceptionTeam", data, error);
 
     if (error) {
       console.error("Error submitting interception team:", error);
@@ -69,7 +78,7 @@ export async function submitInterceptionTeam(
       };
     }
 
-    if (!data || !data.team_id) {
+    if (!data) {
       return {
         status: "error",
         message:
@@ -88,10 +97,12 @@ export async function submitInterceptionTeam(
       data: { teamId: data.team_id },
     };
   } catch (error) {
+    console.error("Error submitting interception team:", error);
     if (error instanceof z.ZodError) {
+      console.log("Zod error:", error.errors);
       return {
         status: "error",
-        message: `Oops! There's an issue with your team data: ${error.errors[0].message}. Can you double-check and try again? 🕵️‍♀️`,
+        message: `Oops! There's an issue with your team data: ${error.name}. Can you double-check and try again? 🕵️‍♀️`,
       };
     }
     return {

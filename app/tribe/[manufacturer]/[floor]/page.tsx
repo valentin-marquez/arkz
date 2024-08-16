@@ -11,15 +11,19 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/server";
-import { Database } from "@/lib/types/database.types";
 import Loading from "@/components/ui/loading";
-import type { TribeTowerData, TeamWithNikkes } from "@/lib/types";
 import TribeTowerSubmitTeamModal from "@/components/tribe/tribe-submit-team-modal";
+import { Tables } from "@/lib/types/database.types";
 
 async function fetchTribeTowerData(
   manufacturer: string,
   floor: number
-): Promise<TribeTowerData> {
+): Promise<{
+  tower: Tables<"tribe_towers">;
+  teams: any[];
+  versions: Tables<"game_versions">[];
+  floor: number;
+}> {
   const supabase = createClient();
 
   const { data: towerData, error: towerError } = await supabase
@@ -38,10 +42,11 @@ async function fetchTribeTowerData(
 
   if (teamsError) throw teamsError;
 
-  const teamsWithNikkes: TeamWithNikkes[] = await Promise.all(
+  const teamsWithNikkes = await Promise.all(
     (teamsWithDetails || []).map(async (team) => {
+      if (!team.team_id) return team;
       const { data: nikkes, error: nikkesError } = await supabase
-        .from("tribe_tower_team_nikkes")
+        .from("tribe_tower_team_nikke_details")
         .select("*, nikkes(*)")
         .eq("team_id", team.team_id);
 
@@ -58,12 +63,12 @@ async function fetchTribeTowerData(
 
   if (versionsError) throw versionsError;
 
-  console.log(teamsWithNikkes);
+  console.log("Tribe Tower Data", teamsWithNikkes);
 
   return {
-    tower: towerData,
+    tower: towerData as Tables<"tribe_towers">,
     teams: teamsWithNikkes,
-    versions: versions || [],
+    versions: versions as Tables<"game_versions">[],
     floor: floor,
   };
 }

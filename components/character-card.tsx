@@ -18,7 +18,7 @@ type CharacterProps = {
   name: string;
   slug: string;
   icon_url: string;
-  rarity: "r" | "sr" | "ssr";
+  rarity: string;
   element: string;
   weapon_type: string;
   isLink?: boolean;
@@ -36,14 +36,8 @@ const CharacterCard: React.FC<CharacterProps> = ({
   isLink = false,
   onClick,
 }) => {
-  const rarityColors = {
-    ssr: "border-yellow-400",
-    sr: "border-purple-400",
-    r: "border-blue-400",
-  };
-
   const cardContent = (
-    <Card className={`w-full overflow-hidden ${rarityColors[rarity]} border-2`}>
+    <Card className={`w-full overflow-hidden border-2`}>
       <CardContent className="p-3 flex items-center space-x-3">
         <motion.div
           whileHover={{ scale: 1.05 }}

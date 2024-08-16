@@ -1,14 +1,15 @@
 // story-store.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Difficulty, Chapter, SortBy } from "@/lib/types";
+import { Difficulty, SortBy } from "@/lib/types";
+import { Tables } from "@/lib/types/database.types";
 
 interface StoryStore {
   difficulty: Difficulty;
   setDifficulty: (difficulty: Difficulty) => void;
-  chapters: Chapter[];
-  setChapters: (chapters: Chapter[]) => void;
-  filteredChapters: Chapter[];
+  chapters: Tables<"chapters">[];
+  setChapters: (chapters: Tables<"chapters">[]) => void;
+  filteredChapters: Tables<"chapters">[];
   loadMore: () => void;
   hasMore: boolean;
   sortBy: SortBy;

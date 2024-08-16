@@ -7,19 +7,19 @@ import { useAuth } from "@/providers/auth-provider";
 import { submitTribeTowerTeam } from "@/app/tribe/action";
 import GenericSubmitTeam from "@/components/base/generic-submit-team";
 import CharacterCard from "@/components/character-card";
-import { Database } from "@/lib/types/database.types";
 import { z } from "zod";
 import { toast } from "@/components/ui/use-toast";
 import { TribeTowerTeamSubmissionSchema } from "@/lib/types/zod";
 import { Manufacturer } from "@/lib/types";
+import { Tables } from "@/lib/types/database.types";
 
-type Nikke = Database["nikkes"];
+type Nikke = Tables<"nikkes">;
 
 interface TribeTowerSubmitTeamProps {
   towerId: string;
   towerName: string;
   floor: number;
-  versions: Database["game_versions"][];
+  versions: Tables<"game_versions">[];
   allowCharacterRepeat: boolean;
   onClose: () => void;
   manufacturer: string;

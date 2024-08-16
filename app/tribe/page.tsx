@@ -1,11 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
-import { Database } from "@/lib/types/database.types";
 import TowerCard from "@/components/tribe/tower-card";
-
-type TribeTower = Database["tribe_towers"];
+import { Tables } from "@/lib/types/database.types";
 
 async function getTowersData(): Promise<{
-  towers: TribeTower[];
+  towers: Tables<"tribe_towers">[];
 }> {
   const supabase = createClient();
 
@@ -16,10 +14,10 @@ async function getTowersData(): Promise<{
 
   if (error) throw error;
 
-  return { towers: towers || [] };
+  return { towers: towers as Tables<"tribe_towers">[] };
 }
 
-function isTowerAvailable(tower) {
+function isTowerAvailable(tower: Tables<"tribe_towers">): boolean {
   if (tower.is_always_available) return true;
 
   const now = new Date();

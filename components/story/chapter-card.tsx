@@ -7,15 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import Image from "next/image";
 import Link from "next/link";
-import { Database } from "@/lib/types/database.types";
+
 import { useStoryStore } from "@/lib/store/story-store";
 import { getMediaURL } from "@/lib/supabase/utils";
+import { Tables } from "@/lib/types/database.types";
 
-interface ChapterCardProps {
-  chapter: Database["chapters"];
-}
-
-export const ChapterCard: React.FC<ChapterCardProps> = ({ chapter }) => {
+export const ChapterCard = ({ chapter }: { chapter: Tables<"chapters"> }) => {
   const { difficulty, completedChapters, toggleChapterCompletion } =
     useStoryStore();
   const isCompleted = completedChapters.includes(chapter.id);

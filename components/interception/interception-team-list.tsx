@@ -1,109 +1,90 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Database } from "@/lib/types/database.types";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import React from "react";
+import GenericTeamList from "../base/generic-team-list";
 import InterceptionTeamCard from "./interception-team-card";
-
-type InterceptionTeam =
-  Database["public"]["Tables"]["interception_teams_with_votes"]["Row"];
-type GameVersion = Database["public"]["Tables"]["game_versions"]["Row"];
-
+import { Database } from "@/lib/types/database.types";
+// import type { TeamWithNikkes } from "@/lib/types/database.types";
+import {
+  Tables,
+  TeamWithNikkesInterception,
+  TeamWithNikkes,
+} from "@/lib/types/database.types";
+//Database["interception_teams_with_votes"][];
 interface InterceptionTeamListProps {
-  initialTeams: InterceptionTeam[];
-  versions: GameVersion[];
+  initialTeams: TeamWithNikkesInterception[];
+  versions: Tables<"game_versions">[];
+  boss: Tables<"bosses">;
 }
 
-export default function InterceptionTeamList({
+const InterceptionTeamList: React.FC<InterceptionTeamListProps> = ({
   initialTeams,
   versions,
-}: InterceptionTeamListProps) {
-  const [teams, setTeams] = useState(initialTeams);
-  const [filteredTeams, setFilteredTeams] = useState(initialTeams);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedVersion, setSelectedVersion] = useState<string | "all">("all");
-
-  useEffect(() => {
-    const filtered = teams.filter(
-      (team) =>
-        (selectedVersion === "all" ||
-          team.game_version_id === selectedVersion) &&
-        team.nikkes.some((nikke) =>
-          nikke.name.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+  boss,
+}) => {
+  const renderTeamCard = (
+    team: TeamWithNikkes,
+    onVote: (teamId: string, voteType: "up" | "down") => void
+  ) => {
+    const interceptionTeam = team as TeamWithNikkesInterception;
+    return (
+      <InterceptionTeamCard
+        id={interceptionTeam.team_id}
+        user={{
+          username: interceptionTeam.username,
+          avatarUrl: interceptionTeam.avatar_url,
+        }}
+        members={interceptionTeam.nikkes}
+        totalVotes={interceptionTeam.total_votes}
+        comment={interceptionTeam.comment || ""}
+        metadata={{ gameVersionId: interceptionTeam.game_version_id }}
+        onVote={onVote}
+        bossName={boss.name}
+        mode="interception"
+      />
     );
-    setFilteredTeams(filtered);
-  }, [teams, searchTerm, selectedVersion]);
+  };
 
-  const handleVote = async (teamId: string) => {
-    // TODO: Implement voting logic
-    console.log("Voted for team:", teamId);
+  const getTeamId = (team: TeamWithNikkes) => team.team_id;
+  const getTeamMembers = (team: TeamWithNikkes) => team.nikkes;
+
+  const filterTeams = (teams: TeamWithNikkes[], filters: any) => {
+    return teams.filter(
+      (team) =>
+        (filters.selectedVersion === "all" ||
+          team.game_version_id === filters.selectedVersion) &&
+        (!filters.searchTerm ||
+          team.nikkes.some((member) =>
+            member.name.toLowerCase().includes(filters.searchTerm.toLowerCase())
+          ))
+    );
+  };
+
+  const sortTeams = (
+    teams: TeamWithNikkes[],
+    sortBy: string,
+    sortOrder: "asc" | "desc"
+  ) => {
+    return [...teams].sort((a, b) => {
+      if (sortBy === "votes") {
+        return sortOrder === "desc"
+          ? b.total_votes - a.total_votes
+          : a.total_votes - b.total_votes;
+      }
+      return 0;
+    });
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex space-x-4">
-        <Input
-          type="text"
-          placeholder="Search teams..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-xs"
-        />
-        <Select value={selectedVersion} onValueChange={setSelectedVersion}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by version" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Versions</SelectItem>
-            {versions.map((version) => (
-              <SelectItem key={version.id} value={version.id}>
-                {version.version}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-        layout
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: { opacity: 0 },
-          visible: {
-            opacity: 1,
-            transition: {
-              staggerChildren: 0.1,
-            },
-          },
-        }}
-      >
-        {filteredTeams.map((team) => (
-          <InterceptionTeamCard
-            key={team.team_id}
-            team={team}
-            onVote={handleVote}
-            mode="interception"
-          />
-        ))}
-      </motion.div>
-
-      {filteredTeams.length === 0 && (
-        <p className="text-center text-muted-foreground">
-          No teams found. Try adjusting your filters.
-        </p>
-      )}
-    </div>
+    <GenericTeamList
+      initialTeams={initialTeams as TeamWithNikkesInterception[]}
+      versions={versions}
+      renderTeamCard={renderTeamCard}
+      getTeamId={getTeamId}
+      getTeamMembers={getTeamMembers}
+      filterTeams={filterTeams}
+      sortTeams={sortTeams}
+    />
   );
-}
+};
+
+export default InterceptionTeamList;

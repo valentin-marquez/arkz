@@ -7,19 +7,19 @@ import { useAuth } from "@/providers/auth-provider";
 import { submitStoryTeam } from "@/app/story/actions";
 import GenericSubmitTeam from "@/components/base/generic-submit-team";
 import CharacterCard from "@/components/character-card";
-import { Database } from "@/lib/types/database.types";
 import { z } from "zod";
 import { toast } from "@/components/ui/use-toast";
 import { StoryTeamSubmissionSchema } from "@/lib/types/zod";
+import { Tables } from "@/lib/types/database.types";
 
-type Nikke = Database["nikkes"];
+type Nikke = Tables<"nikkes">;
 
 interface StorySubmitTeamProps {
   modeId: string;
   modeName: string;
   chapterId: string;
   numberOfTeams: number;
-  versions: Database["game_versions"][];
+  versions: Tables<"game_versions">[];
   allowCharacterRepeat: boolean;
   onClose: () => void;
 }

@@ -22,20 +22,24 @@ import {
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Label } from "@/components/ui/label";
-import { Database } from "@/lib/types/database.types";
 import { motion } from "framer-motion";
+import { Tables, TeamWithNikkes } from "@/lib/types/database.types";
 
 interface GenericTeamListProps<T> {
-  initialTeams: T[];
-  versions: Database["game_versions"][];
+  initialTeams: TeamWithNikkes[];
+  versions: Tables<"game_versions">[];
   renderTeamCard: (
-    team: T,
+    team: TeamWithNikkes,
     onVote: (teamId: string, voteType: "up" | "down") => void
   ) => React.ReactNode;
-  getTeamId: (team: T) => string;
-  getTeamMembers: (team: T) => { id: string; name: string }[];
-  filterTeams: (teams: T[], filters: any) => T[];
-  sortTeams: (teams: T[], sortBy: string, sortOrder: "asc" | "desc") => T[];
+  getTeamId: (team: TeamWithNikkes) => string;
+  getTeamMembers: (team: TeamWithNikkes) => TeamWithNikkes["nikkes"];
+  filterTeams: (teams: TeamWithNikkes[], filters: any) => TeamWithNikkes[];
+  sortTeams: (
+    teams: TeamWithNikkes[],
+    sortBy: string,
+    sortOrder: "asc" | "desc"
+  ) => TeamWithNikkes[];
 }
 
 export default function GenericTeamList<T>({

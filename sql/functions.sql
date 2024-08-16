@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION submit_story_team(
   p_game_version_id UUID,
   p_comment TEXT,
   p_nikkes JSON
-) RETURNS JSON AS $$
+) RETURNS TABLE (team_id UUID) AS $$
 DECLARE
   v_team_id UUID;
   v_nikke JSON;
@@ -27,7 +27,8 @@ BEGIN
     VALUES (v_team_id, (v_nikke->>'id')::UUID, (v_nikke->>'position')::INTEGER);
   END LOOP;
 
-  RETURN json_build_object('team_id', v_team_id);
+  RETURN QUERY
+        SELECT v_team_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -39,7 +40,7 @@ CREATE OR REPLACE FUNCTION submit_tribe_tower_team(
   p_game_version_id UUID,
   p_comment TEXT,
   p_nikkes JSON
-) RETURNS JSON AS $$
+) RETURNS TABLE (team_id UUID) AS $$
 DECLARE
   v_team_id UUID;
   v_nikke JSON;
@@ -56,7 +57,8 @@ BEGIN
     VALUES (v_team_id, (v_nikke->>'id')::UUID, (v_nikke->>'position')::INTEGER);
   END LOOP;
 
-  RETURN json_build_object('team_id', v_team_id);
+  RETURN QUERY
+        SELECT v_team_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -69,12 +71,12 @@ CREATE OR REPLACE FUNCTION submit_interception_team(
   p_game_version_id UUID,
   p_comment TEXT,
   p_nikkes JSON
-) RETURNS JSON AS $$
+) RETURNS TABLE (team_id UUID) AS $$
 DECLARE
   v_team_id UUID;
   v_nikke JSON;
 BEGIN
-  -- Insert the interception team
+  -- Insert the interception team and capture the team_id
   INSERT INTO interception_teams (user_id, mode_id, boss_id, comment, game_version_id)
   VALUES (p_user_id, p_mode_id, p_boss_id, p_comment, p_game_version_id)
   RETURNING id INTO v_team_id;
@@ -86,7 +88,11 @@ BEGIN
     VALUES (v_team_id, (v_nikke->>'id')::UUID, (v_nikke->>'position')::INTEGER);
   END LOOP;
 
-  RETURN json_build_object('team_id', v_team_id);
+  -- Return the team_id as a result using a SELECT statement
+  RETURN QUERY 
+  SELECT id AS team_id 
+  FROM interception_teams 
+  WHERE id = v_team_id;
 END;
 $$ LANGUAGE plpgsql;
 

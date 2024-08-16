@@ -15,21 +15,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getMediaURL } from "@/lib/supabase/utils";
-
-type Boss = {
-  id: string;
-  name: string;
-  description: string | null;
-  image_url: string | null;
-  element: string | null;
-  weak_element: string | null;
-  mode_id: string | null;
-  mode_type: string | null;
-  slug: string;
-};
+import { Tables } from "@/lib/types/database.types";
 
 interface InterceptionBossCardProps {
-  boss: Boss;
+  boss: Tables<"bosses">;
 }
 
 const InterceptionBossCard: React.FC<InterceptionBossCardProps> = ({
@@ -110,7 +99,7 @@ const InterceptionBossCard: React.FC<InterceptionBossCardProps> = ({
 };
 
 interface InterceptionBossListProps {
-  initialBosses: Boss[];
+  initialBosses: Tables<"bosses">[];
 }
 
 const InterceptionBossList: React.FC<InterceptionBossListProps> = ({

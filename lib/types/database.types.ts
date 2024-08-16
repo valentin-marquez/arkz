@@ -1,36 +1,53 @@
-import type { Database as DatabaseType } from "./supabase";
+import { MergeDeep } from "type-fest";
+import { Database as DatabaseGenerated } from "./supabase";
 
-export type Database = {
-  [P in keyof DatabaseType["public"]["Tables"]]: DatabaseType["public"]["Tables"][P]["Row"];
+// Utility type to make all properties non-nullable
+type NonNullableProperties<T> = {
+  [P in keyof T]: NonNullable<T[P]>;
+};
+
+// Simplified access to tables and views
+export type SimplifiedDatabase = {
+  [K in keyof DatabaseGenerated["public"]["Tables"]]: NonNullableProperties<
+    DatabaseGenerated["public"]["Tables"][K]["Row"]
+  >;
 } & {
-  [P in keyof DatabaseType["public"]["Views"]]: DatabaseType["public"]["Views"][P]["Row"];
+  [K in keyof DatabaseGenerated["public"]["Views"]]: NonNullableProperties<
+    DatabaseGenerated["public"]["Views"][K]["Row"]
+  >;
 };
 
-type RemoveNullOn<T, O extends keyof T = never> = {
-  [P in keyof T]: P extends O ? Exclude<T[P], null> : T[P];
-};
-type RemoveNullExcept<T, E extends keyof T = never> = {
-  [P in keyof T]: P extends E ? T[P] : Exclude<T[P], null>;
-};
-
-export type teams_with_chapter_votes = RemoveNullExcept<
-  Database["teams_with_chapter_votes"],
-  "comment"
+// Merge the simplified structure with the original
+export type Database = MergeDeep<
+  DatabaseGenerated,
+  {
+    public: SimplifiedDatabase;
+  }
 >;
 
-export type team_nikke_details = RemoveNullExcept<
-  Database["team_nikke_details"]
->;
+// Export the Json type from the generated types
+export type { Json } from "./supabase";
 
-export type teams_with_votes = RemoveNullExcept<Database["teams_with_votes"]>;
+// Helper type for easier access to tables and views
+export type TableOrView = keyof SimplifiedDatabase;
 
-export type tribe_tower_teams_with_votes = RemoveNullExcept<
-  Database["tribe_tower_teams_with_votes"],
-  "comment"
->;
+// Helper type for accessing a specific table or view
+export type Tables<T extends TableOrView> = SimplifiedDatabase[T];
 
-export type TeamWithNikkes = teams_with_chapter_votes & {
-  nikkes: team_nikke_details[];
+export type TeamWithNikkesStory = Tables<"teams_with_chapter_votes"> & {
+  nikkes: Tables<"team_nikke_details">[];
 };
 
-export type GameVersion = RemoveNullExcept<Database["game_versions"]>;
+export type TeamWithNIkkesTribe = Tables<"tribe_tower_teams_detailed"> & {
+  nikkes: Tables<"tribe_tower_team_nikke_details">[];
+};
+
+export type TeamWithNikkesInterception =
+  Tables<"interception_teams_with_votes_and_boss"> & {
+    nikkes: Tables<"interception_team_nikke_details">[];
+  };
+
+export type TeamWithNikkes =
+  | TeamWithNikkesStory
+  | TeamWithNIkkesTribe
+  | TeamWithNikkesInterception;

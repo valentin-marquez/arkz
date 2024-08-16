@@ -63,6 +63,8 @@ async function getTeamDetails(shortCode: string): Promise<TeamDetails | null> {
 export default async function TeamPage({ params }: { params: { id: string } }) {
   const team = await getTeamDetails(params.id);
 
+  console.log(team);
+
   if (!team) {
     notFound();
   }

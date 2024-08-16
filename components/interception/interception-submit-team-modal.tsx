@@ -5,22 +5,19 @@ import { signInWithDiscord } from "@/app/actions/auth";
 import { usePathname } from "next/navigation";
 import GenericSubmitTeamModal from "@/components/base/generic-submit-team-modal";
 import InterceptionSubmitTeam from "./interception-submit-team";
-import { Database } from "@/lib/types/database.types";
-
-type Boss = Database["bosses"];
-type GameVersion = Database["game_versions"];
+import { Tables } from "@/lib/types/database.types";
 
 interface InterceptionSubmitTeamModalProps {
   modeId: string;
   modeName: string;
-  bosses: Boss[];
-  versions: GameVersion[];
+  boss: Tables<"bosses">;
+  versions: Tables<"game_versions">[];
 }
 
 export default function InterceptionSubmitTeamModal({
   modeId,
   modeName,
-  bosses,
+  boss,
   versions,
 }: InterceptionSubmitTeamModalProps) {
   const { user } = useAuth();
@@ -39,13 +36,13 @@ export default function InterceptionSubmitTeamModal({
 
   return (
     <GenericSubmitTeamModal
-      modalTitle={`Submit Team for ${modeName}`}
-      modalDescription={`Submit your team for ${modeName} mode. Choose your team to take on the boss!`}
+      modalTitle={`Submit Team for ${boss.name}`}
+      modalDescription={`Submit you team for ${modeName} mode. Choose your team to take on ${boss.name}!`}
       SubmitTeamComponent={InterceptionSubmitTeam}
       submitTeamProps={{
         modeId,
         modeName,
-        bosses,
+        boss,
         versions,
         onClose: handleClose,
       }}

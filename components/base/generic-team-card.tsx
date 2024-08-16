@@ -23,12 +23,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import type { team_nikke_details } from "@/lib/types/database.types";
 import { getMediaURL } from "@/lib/supabase/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { createClient } from "@/lib/supabase/client";
 import { getURL } from "@/lib/utils";
 import TeamShortUrlGenerator from "@/components/team-short-url-generator";
+import { Tables } from "@/lib/types/database.types";
 
 export interface TeamCardProps {
   id: string;
@@ -36,7 +36,7 @@ export interface TeamCardProps {
     username: string;
     avatarUrl: string;
   };
-  members: team_nikke_details[];
+  members: Tables<"team_nikke_details">[];
   totalVotes: number;
   comment?: string;
   metadata: Record<string, string | number>;

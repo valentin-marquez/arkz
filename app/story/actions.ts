@@ -1,7 +1,7 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { Database } from "@/lib/types/database.types";
+import { Tables } from "@/lib/types/database.types";
 import { z } from "zod";
 import {
   StoryTeamSubmissionSchema,
@@ -11,17 +11,17 @@ import {
 export async function getChapters(): Promise<{
   status: string;
   message?: string;
-  data?: Database["chapters"][];
+  data?: Tables<"chapters">[];
 }> {
   const supabase = createClient();
 
-  const { data, error }: Database = await supabase.from("chapters").select("*");
+  const { data, error } = await supabase.from("chapters").select("*");
 
   if (error) {
     return { status: "error", message: error.message };
   }
 
-  return { status: "success", data: data };
+  return { status: "success", data: data as Tables<"chapters">[] };
 }
 
 export async function submitStoryTeam(
@@ -48,14 +48,16 @@ export async function submitStoryTeam(
       };
     }
 
-    const { data, error } = await supabase.rpc("submit_story_team", {
-      p_user_id: submission.userId,
-      p_mode_id: submission.modeId,
-      p_chapter_id: submission.chapterId,
-      p_game_version_id: submission.gameVersionId,
-      p_comment: submission.comment,
-      p_nikkes: submission.nikkes,
-    });
+    const { data, error } = await supabase
+      .rpc("submit_story_team", {
+        p_user_id: submission.userId,
+        p_mode_id: submission.modeId,
+        p_chapter_id: submission.chapterId,
+        p_game_version_id: submission.gameVersionId,
+        p_comment: submission.comment || "",
+        p_nikkes: submission.nikkes,
+      })
+      .single();
 
     if (error) {
       console.error("Error submitting story team:", error);
