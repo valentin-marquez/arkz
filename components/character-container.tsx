@@ -18,6 +18,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Database } from "@/lib/types/database.types";
 import { motion } from "framer-motion";
+import { getMediaURL } from "@/lib/supabase/utils";
 
 const rarities: Rarity[] = ["R", "SR", "SSR"];
 const elements: Element[] = ["Iron", "Electric", "Fire", "Wind", "Water"];
@@ -129,7 +130,9 @@ export default function CharacterContainer({
                     }
                   >
                     <Image
-                      src={`/images/element/element_${element.toLowerCase()}.webp`}
+                      src={getMediaURL(
+                        `/images/elements/element_${element.toLowerCase()}.webp`
+                      )}
                       alt={element}
                       width={16}
                       height={16}
@@ -156,7 +159,9 @@ export default function CharacterContainer({
                     }
                   >
                     <Image
-                      src={`/images/weapons/weapon_${weaponType.toLowerCase()}.webp`}
+                      src={getMediaURL(
+                        `/images/weapons/weapon_${weaponType.toLowerCase()}.webp`
+                      )}
                       alt={weaponType}
                       width={24}
                       height={24}

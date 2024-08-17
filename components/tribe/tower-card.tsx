@@ -14,6 +14,8 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FixedSizeList } from "react-window";
+import { getMediaURL } from "@/lib/supabase/utils";
+import { useTheme } from "next-themes";
 
 type TowerCardProps = {
   id: string;
@@ -35,6 +37,7 @@ const TowerCard: React.FC<TowerCardProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedFloor, setSelectedFloor] = useState<string>("");
   const router = useRouter();
+  const { theme } = useTheme();
 
   const handleCardClick = useCallback(() => {
     setIsExpanded((prev) => !prev);
@@ -88,11 +91,22 @@ const TowerCard: React.FC<TowerCardProps> = ({
           <div className="flex-grow flex items-center justify-center my-4">
             {manufacturer !== "all" ? (
               <Image
-                src={`/Images/Manufacturers/manufacturer_${manufacturer.toLowerCase()}.webp`}
+                // src={`/Images/Manufacturers/manufacturer_${manufacturer.toLowerCase()}.webp`}
+                src={getMediaURL(
+                  `/images/manufacturers/manufacturer_${manufacturer.toLowerCase()}.webp`
+                )}
                 alt={`${manufacturer} logo`}
                 width={100}
                 height={100}
-                className="object-contain dark:filter dark:invert"
+                className={`rounded-full
+                  ${
+                    // estos son los estilos dark mode
+                    theme === "default" ||
+                    theme === "dark-dorothy" ||
+                    theme === "dark-red-hood"
+                      ? ""
+                      : "filter invert"
+                  }`}
               />
             ) : (
               <div className="text-4xl font-bold text-primary dark:text-primary-foreground">

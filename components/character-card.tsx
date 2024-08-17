@@ -76,7 +76,9 @@ const CharacterCard: React.FC<CharacterProps> = ({
               <Tooltip>
                 <TooltipTrigger>
                   <Image
-                    src={`/Images/element/element_${element.toLowerCase()}.webp`}
+                    src={getMediaURL(
+                      `/images/elements/element_${element.toLowerCase()}.webp`
+                    )}
                     alt={element}
                     width={20}
                     height={20}
@@ -93,7 +95,9 @@ const CharacterCard: React.FC<CharacterProps> = ({
               <Tooltip>
                 <TooltipTrigger>
                   <Image
-                    src={`/Images/weapons/weapon_${weapon_type.toLowerCase()}.webp`}
+                    src={getMediaURL(
+                      `/images/weapons/weapon_${weapon_type.toLowerCase()}.webp`
+                    )}
                     alt={weapon_type}
                     width={20}
                     height={20}

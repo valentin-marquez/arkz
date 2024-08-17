@@ -10,68 +10,9 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/lib/supabase/server";
 import Loading from "@/components/ui/loading";
 import TribeTowerSubmitTeamModal from "@/components/tribe/tribe-submit-team-modal";
-import { Tables } from "@/lib/types/database.types";
-
-async function fetchTribeTowerData(
-  manufacturer: string,
-  floor: number
-): Promise<{
-  tower: Tables<"tribe_towers">;
-  teams: any[];
-  versions: Tables<"game_versions">[];
-  floor: number;
-}> {
-  const supabase = createClient();
-
-  const { data: towerData, error: towerError } = await supabase
-    .from("tribe_towers")
-    .select("*")
-    .eq("manufacturer", manufacturer)
-    .single();
-
-  if (towerError) throw towerError;
-
-  const { data: teamsWithDetails, error: teamsError } = await supabase
-    .from("tribe_tower_teams_detailed")
-    .select("*")
-    .eq("tower_manufacturer", manufacturer)
-    .eq("floor", floor);
-
-  if (teamsError) throw teamsError;
-
-  const teamsWithNikkes = await Promise.all(
-    (teamsWithDetails || []).map(async (team) => {
-      if (!team.team_id) return team;
-      const { data: nikkes, error: nikkesError } = await supabase
-        .from("tribe_tower_team_nikke_details")
-        .select("*, nikkes(*)")
-        .eq("team_id", team.team_id);
-
-      if (nikkesError) throw nikkesError;
-
-      return { ...team, nikkes: nikkes || [] };
-    })
-  );
-
-  const { data: versions, error: versionsError } = await supabase
-    .from("game_versions")
-    .select("*")
-    .order("release_date", { ascending: false });
-
-  if (versionsError) throw versionsError;
-
-  console.log("Tribe Tower Data", teamsWithNikkes);
-
-  return {
-    tower: towerData as Tables<"tribe_towers">,
-    teams: teamsWithNikkes,
-    versions: versions as Tables<"game_versions">[],
-    floor: floor,
-  };
-}
+import { fetchTribeTowerData } from "@/app/actions/tribe";
 
 export default async function Page({
   params,
@@ -105,7 +46,7 @@ export default async function Page({
           </Breadcrumb>
 
           <div className="px-8 flex flex-wrap flex-col">
-            <h1 className="text-2xl">Tribe Tower</h1>
+            <h1 className="text-2xl w-fit">Tribe Tower</h1>
             <p className="text-muted-foreground mt-0 capitalize text-sm">
               {manufacturer} - Floor {floor}
             </p>
@@ -118,14 +59,16 @@ export default async function Page({
       <Card className="container mx-auto w-full p-0">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle>Teams</CardTitle>
-          <TribeTowerSubmitTeamModal
-            towerId={data.tower.id}
-            towerName={data.tower.name}
-            floor={floorNumber}
-            allowCharacterRepeat={false}
-            versions={data.versions}
-            manufacturer={manufacturer}
-          />
+          <Suspense fallback={<Loading />}>
+            <TribeTowerSubmitTeamModal
+              towerId={data.tower.id}
+              towerName={data.tower.name}
+              floor={floorNumber}
+              allowCharacterRepeat={false}
+              versions={data.versions}
+              manufacturer={manufacturer}
+            />
+          </Suspense>
         </CardHeader>
         <CardContent className="p-4 pt-0 xl:p-6">
           <Suspense fallback={<Loading />}>

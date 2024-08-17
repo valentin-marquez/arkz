@@ -28,3 +28,12 @@ export const getURL = (path: string = "") => {
   // Concatenate the URL and the path.
   return path ? `${url}/${path}` : url;
 };
+
+export const mappingLogoThemes = {
+  default: "/logo-white.png",
+  light: "/logo-black.png",
+  dorothy: "/logo-black.png",
+  "dark-dorothy": "/logo-white.png",
+  "red-hood": "/logo-black.png",
+  "dark-red-hood": "/logo-white.png",
+};

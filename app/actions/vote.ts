@@ -7,10 +7,10 @@ export async function voteForTeam(teamId: string, voteType: "up" | "down") {
 
   // Get the current user
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  if (!user) {
+  if (!session?.user) {
     throw new Error("User must be logged in to vote");
   }
 
@@ -18,7 +18,7 @@ export async function voteForTeam(teamId: string, voteType: "up" | "down") {
   const { data: existingVote, error: checkError } = await supabase
     .from("votes")
     .select("id, vote")
-    .eq("user_id", user.id)
+    .eq("user_id", session.user.id)
     .eq("team_id", teamId)
     .single();
 
@@ -40,7 +40,7 @@ export async function voteForTeam(teamId: string, voteType: "up" | "down") {
     // Insert new vote
     const { error: insertError } = await supabase
       .from("votes")
-      .insert({ user_id: user.id, team_id: teamId, vote: voteValue });
+      .insert({ user_id: session.user.id, team_id: teamId, vote: voteValue });
 
     if (insertError) throw insertError;
   }

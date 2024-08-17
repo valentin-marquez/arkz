@@ -37,6 +37,7 @@ import SettingsDialog from "@/components/ui/settings";
 import { signInWithDiscord, signOut } from "@/app/actions/auth";
 import { useAuth } from "@/providers/auth-provider";
 import { createClient } from "@/lib/supabase/client";
+import { mappingLogoThemes } from "@/lib/utils";
 
 type SidebarOption = {
   icon: React.ElementType;
@@ -112,15 +113,6 @@ const Sidebar: React.FC = () => {
     await signInWithDiscord({ pathname });
   }
 
-  const mappingLogoThemes = {
-    default: "/logo-white.png",
-    light: "/logo-black.png",
-    dorothy: "/logo-black.png",
-    "dark-dorothy": "/logo-white.png",
-    "red-hood": "/logo-black.png",
-    "dark-red-hood": "/logo-white.png",
-  };
-
   return (
     <motion.aside
       initial={false}
@@ -139,10 +131,8 @@ const Sidebar: React.FC = () => {
           <Image
             alt="Victorix Logo"
             src={
-              easterEggCount === 5
-                ? "/logo.png"
-                : mappingLogoThemes[theme as keyof typeof mappingLogoThemes] ||
-                  "/logo-black.png"
+              mappingLogoThemes[theme as keyof typeof mappingLogoThemes] ||
+              "/logo-black.png"
             }
             width={36}
             height={36}
