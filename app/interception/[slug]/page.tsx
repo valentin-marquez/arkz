@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import InterceptionTeamList from "@/components/interception/interception-team-list";
 import InterceptionSubmitTeamModal from "@/components/interception/interception-submit-team-modal";
 import { Tables } from "@/lib/types/database.types";
+import { Metadata } from "next";
 
 async function fetchBossData(slug: string): Promise<{
   boss: Tables<"bosses"> | null;
@@ -65,6 +66,27 @@ async function fetchBossData(slug: string): Promise<{
     boss: (boss as Tables<"bosses">) || null,
     teams: teamsWithNikkes,
     versions: (versions as Tables<"game_versions">[]) || [],
+  };
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const { slug } = params;
+
+  const { boss } = await fetchBossData(slug);
+
+  return {
+    title: `${
+      boss?.name || "Interception Boss"
+    } Guide - Victorix | Nikke: Goddess of Victory`,
+    description: `Defeat ${
+      boss?.name || "this boss"
+    } in the Interception mode of Nikke: Goddess of Victory. Learn the best strategies, team compositions, and tips to conquer ${
+      boss?.name || "this challenging boss"
+    }.`,
   };
 }
 

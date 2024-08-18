@@ -14,6 +14,20 @@ import { createClient } from "@/lib/supabase/server";
 import Loading from "@/components/ui/loading";
 import StorySubmitTeamModal from "@/components/story/story-submit-team-modal";
 import { Tables } from "@/lib/types/database.types";
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { difficulty: string; chapter: string };
+}): Promise<Metadata> {
+  const { difficulty, chapter } = params;
+
+  return {
+    title: `Victorix - Nikke Chapter ${chapter} Guide | ${difficulty} Difficulty`,
+    description: `Conquer Chapter ${chapter} in Nikke: Goddess of Victory with our in-depth strategies and team compositions for ${difficulty} difficulty. Maximize your squad’s potential and dominate every challenge.`,
+  };
+}
 
 async function fetchChapterData(
   difficulty: string,

@@ -1,6 +1,14 @@
 import { createClient } from "@/lib/supabase/server";
 import TowerCard from "@/components/tribe/tower-card";
 import { Tables } from "@/lib/types/database.types";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Tribe Tower - Victorix",
+  description:
+    "Find the best team compositions to dominate every Tribe Tower in Nikke: Goddess of Victory. Explore top strategies and optimize your teams for each challenge.",
+};
+
 
 async function getTowersData(): Promise<{
   towers: Tables<"tribe_towers">[];

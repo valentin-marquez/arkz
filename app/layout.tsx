@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Sidebar from "@/components/ui/sidebar";
 import { AuthProvider } from "@/providers/auth-provider";
 import CloudflareWebAnalyticsProvider from "next-cloudflare-web-analytics";
+import FramerProvider from "@/providers/framer-provider";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -24,11 +25,26 @@ export const metadata: Metadata = {
   openGraph: {
     title,
     description,
+    url: getURL(),
+    siteName: title,
+    type: "website",
+    locale: "en_US",
   },
   icons: {
     icon: {
       url: "/logo-white.png",
       sizes: "564x564",
+    },
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: true, // Don't index images
+      "max-image-preview": "none", // Don't show images in search results
+      "max-snippet": 50, // Limit snippet length
     },
   },
 };
@@ -57,16 +73,18 @@ export default function RootLayout({
         ]}
       >
         <AuthProvider>
-          <body
-            className={cn(
-              "flex min-h-screen bg-background font-sans antialiased *:select-none",
-              fontSans.variable
-            )}
-          >
-            <Sidebar />
-            <main className="flex-1 p-4 overflow-auto">{children}</main>
-            <Toaster />
-          </body>
+          <FramerProvider>
+            <body
+              className={cn(
+                "flex min-h-screen bg-background font-sans antialiased *:select-none",
+                fontSans.variable
+              )}
+            >
+              <Sidebar />
+              <main className="flex-1 p-4 overflow-auto">{children}</main>
+              <Toaster />
+            </body>
+          </FramerProvider>
         </AuthProvider>
       </ThemeProvider>
     </html>

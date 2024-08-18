@@ -13,6 +13,20 @@ import { Separator } from "@/components/ui/separator";
 import Loading from "@/components/ui/loading";
 import TribeTowerSubmitTeamModal from "@/components/tribe/tribe-submit-team-modal";
 import { fetchTribeTowerData } from "@/app/actions/tribe";
+import { Metadata, ResolvingMetadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { manufacturer: string; floor: string };
+}): Promise<Metadata> {
+  const { manufacturer, floor } = params;
+
+  return {
+    title: `Victorix - ${manufacturer} Tribe Tower Guide | Floor ${floor} Strategy & Team Comps`,
+    description: `Master Floor ${floor} of the ${manufacturer} Tribe Tower in Nikke: Goddess of Victory with top-tier team compositions and strategies. Explore optimized setups to ensure your victory in every battle.`,
+  };
+}
 
 export default async function Page({
   params,
