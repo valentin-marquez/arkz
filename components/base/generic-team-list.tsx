@@ -22,7 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Label } from "@/components/ui/label";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { Tables, TeamWithNikkes } from "@/lib/types/database.types";
 
 interface GenericTeamListProps<T> {

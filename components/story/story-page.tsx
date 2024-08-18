@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { StoryTabs } from "./story-tabs";
 import { ChapterGrid } from "./chapter-grid";
 import { Filters } from "./filters";

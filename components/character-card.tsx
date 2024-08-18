@@ -1,17 +1,12 @@
 "use client";
+
 import React from "react";
 import Image from "next/image";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { getMediaURL } from "@/lib/supabase/utils";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 
 type CharacterProps = {
   id: string;
@@ -57,59 +52,29 @@ const CharacterCard: React.FC<CharacterProps> = ({
         <div className="flex-grow">
           <h3 className="text-base font-semibold line-clamp-1">{name}</h3>
           <div className="flex items-center space-x-1 mt-1">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Badge
-                    variant="outline"
-                    className={`text-xs ${rarity}-badge`}
-                  >
-                    {rarity.toUpperCase()}
-                  </Badge>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Rarity: {rarity.toUpperCase()}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Image
-                    src={getMediaURL(
-                      `/images/elements/element_${element.toLowerCase()}.webp`
-                    )}
-                    alt={element}
-                    width={20}
-                    height={20}
-                    placeholder="empty"
-                    blurDataURL="/placeholder-image.png"
-                  />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Element: {element}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Image
-                    src={getMediaURL(
-                      `/images/weapons/weapon_${weapon_type.toLowerCase()}.webp`
-                    )}
-                    alt={weapon_type}
-                    width={20}
-                    height={20}
-                    placeholder="empty"
-                    blurDataURL="/placeholder-image.png"
-                  />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Weapon: {weapon_type}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Badge variant="outline" className={`text-xs ${rarity}-badge`}>
+              {rarity.toUpperCase()}
+            </Badge>
+            <Image
+              src={getMediaURL(
+                `/images/elements/element_${element.toLowerCase()}.webp`
+              )}
+              alt={element}
+              width={20}
+              height={20}
+              placeholder="empty"
+              blurDataURL="/placeholder-image.png"
+            />
+            <Image
+              src={getMediaURL(
+                `/images/weapons/weapon_${weapon_type.toLowerCase()}.webp`
+              )}
+              alt={weapon_type}
+              width={20}
+              height={20}
+              placeholder="empty"
+              blurDataURL="/placeholder-image.png"
+            />
           </div>
         </div>
       </CardContent>

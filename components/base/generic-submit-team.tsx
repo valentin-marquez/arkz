@@ -6,7 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search } from "lucide-react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { useCharacterStore } from "@/lib/store/character-store";
 import { useTeamStore } from "@/lib/store/team-store";
 import { createClient } from "@/lib/supabase/client";

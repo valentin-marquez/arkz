@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 
 const SettingsDialog = () => {
   const { theme, setTheme } = useTheme();

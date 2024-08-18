@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -58,8 +58,8 @@ const sidebarOptions: SidebarOption[] = [
 ];
 
 const Sidebar: React.FC = () => {
-  const [isCollapsed, setIsCollapsed] = React.useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const isDesktop = useBetterMediaQuery("(min-width: 1024px)");
   const { theme, setTheme } = useTheme();
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
@@ -68,13 +68,27 @@ const Sidebar: React.FC = () => {
   const [isAdmin, setIsAdmin] = useState(false);
 
   const sidebarVariants = {
-    expanded: { width: "15rem" },
-    collapsed: { width: "4rem" },
+    open: {
+      width: "15rem",
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 40,
+      },
+    },
+    closed: {
+      width: "4rem",
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 40,
+      },
+    },
   };
-  let easterEggCount = 0;
 
-  const countEasterEgg = () => {
-    easterEggCount += 1;
+  const contentVariants = {
+    open: { opacity: 1, x: 0 },
+    closed: { opacity: 0, x: -10 },
   };
 
   useEffect(() => {
@@ -116,13 +130,16 @@ const Sidebar: React.FC = () => {
   return (
     <motion.aside
       initial={false}
+      onMouseEnter={() => isDesktop && setIsCollapsed(false)}
+      onMouseLeave={() => isDesktop && setIsCollapsed(true)}
       animate={isCollapsed ? "collapsed" : "expanded"}
       variants={sidebarVariants}
-      transition={{ type: "spring", bounce: 0.05, duration: 0.25 }}
+      transition={{ type: "spring", bounce: 0.05, duration: 0.2 }}
       className={`
         flex flex-col justify-between h-screen bg-background text-foreground
         transition-all duration-300 ease-in-out border-r border-border py-2
         sticky top-0 z-10
+        ${isCollapsed ? "" : "fixed top-0 left-0"}
       `}
     >
       {/* Logo section */}
@@ -137,7 +154,6 @@ const Sidebar: React.FC = () => {
             width={36}
             height={36}
             className="group-hover:animate-spin"
-            onClick={countEasterEgg}
           />
           <AnimatePresence>
             {!isCollapsed && isDesktop && (
@@ -228,27 +244,36 @@ const Sidebar: React.FC = () => {
         </TooltipProvider>
       </nav>
 
-      {isDesktop && (
+      <motion.div
+        className="fixed top-4 left-4 z-50"
+        initial={false}
+        animate={isCollapsed ? "closed" : "open"}
+        variants={{
+          open: { x: "10rem" },
+          closed: { x: "2rem" },
+        }}
+        transition={{ type: "spring", stiffness: 400, damping: 40 }}
+      >
         <motion.div
-          className="absolute top-2 mt-2 -right-5"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
           <Button
             variant="ghost"
             size="icon"
             onClick={toggleSidebar}
-            className="bg-gradient-to-b from-muted to-card border border-border rounded-full size-8"
+            className="bg-gradient-to-b from-muted to-card border border-border rounded-full size-8 shadow-md hover:shadow-lg transition-shadow duration-300"
           >
             <motion.div
-              animate={{ rotate: isCollapsed ? 180 : 0 }}
-              transition={{ type: "spring", bounce: 0.05, duration: 0.25 }}
+              animate={{ rotate: isCollapsed ? 0 : 180 }}
+              transition={{ type: "spring", stiffness: 200, damping: 20 }}
             >
-              <ChevronLeft className="w-3 h-3" />
+              <ChevronRight className="w-3 h-3" />
             </motion.div>
           </Button>
         </motion.div>
-      )}
+      </motion.div>
 
       <div className="mt-auto p-2 border-t border-border">
         {user ? (
@@ -262,7 +287,7 @@ const Sidebar: React.FC = () => {
               <>
                 <Image
                   src={user.user_metadata.avatar_url}
-                  alt="User Avatar"
+                  alt={`${user.user_metadata.full_name}'s Avatar`}
                   width={32}
                   height={32}
                   className="rounded-full"
@@ -324,25 +349,33 @@ const OptionContent: React.FC<{
 }> = ({ option, isActive, isCollapsed, isDesktop }) => (
   <div
     className={cn(
-      isCollapsed
-        ? "w-full flex flex-row items-center justify-center"
-        : "w-full flex flex-row items-center overflow-hidden"
+      "w-full flex flex-row items-center transition-all duration-300 ease-in-out",
+      isCollapsed ? "justify-center" : "justify-start overflow-hidden"
     )}
   >
-    <option.icon
-      className={cn("w-5 h-5 flex-shrink-0", isActive && "text-primary")}
-    />
-    <AnimatePresence>
-      {!isCollapsed && isDesktop && (
+    <motion.div
+      initial={false}
+      animate={isCollapsed ? { rotate: 0 } : { rotate: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <option.icon
+        className={cn("w-5 h-5 flex-shrink-0", isActive && "text-primary")}
+      />
+    </motion.div>
+    <AnimatePresence mode="popLayout">
+      {!isCollapsed && (
         <motion.span
           className={cn(
             "ml-3 text-sm whitespace-nowrap",
             isActive && "font-semibold"
           )}
-          initial={{ opacity: 0, x: -28 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -28 }}
-          transition={{ type: "spring", bounce: 0.05, duration: 0.25 }}
+          initial={{ opacity: 0, width: 0 }}
+          animate={{ opacity: 1, width: "auto" }}
+          exit={{ opacity: 0, width: 0 }}
+          transition={{
+            opacity: { duration: 0.2 },
+            width: { duration: 0.3 },
+          }}
         >
           {option.label}
         </motion.span>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,8 +17,10 @@ import CharacterCard from "@/components/character-card";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Database } from "@/lib/types/database.types";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import { getMediaURL } from "@/lib/supabase/utils";
+import SkeletonLoader from "./skeletons/character-card-skeleton";
+import CharacterCardSkeleton from "./skeletons/character-card-skeleton";
 
 const rarities: Rarity[] = ["R", "SR", "SSR"];
 const elements: Element[] = ["Iron", "Electric", "Fire", "Wind", "Water"];
@@ -241,6 +243,7 @@ export default function CharacterContainer({
       >
         {filteredCharacters.map((character) => (
           <div key={character.id}>
+            {/* <CharacterCard {...character} /> */}
             <CharacterCard {...character} />
           </div>
         ))}
