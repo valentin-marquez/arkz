@@ -100,7 +100,6 @@ export default function InterceptionSubmitTeam({
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.log("Validation error:", error.errors);
         toast({
           title: "Validation Error",
           description: `Oops! There's an issue with your team data. Can you double-check and try again? 🕵️‍♀️`,

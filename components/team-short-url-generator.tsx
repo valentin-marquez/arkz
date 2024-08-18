@@ -32,10 +32,6 @@ const TeamShortUrlGenerator = ({
       p_mode: mode,
     });
 
-    console.log(teamId, mode);
-
-    console.log(data, error);
-
     setIsLoading(false);
 
     if (error) {

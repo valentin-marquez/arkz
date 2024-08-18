@@ -62,8 +62,6 @@ export default function GenericTeamList<T>({
   const [sortBy, setSortBy] = useState("votes");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  console.log("teams", teams);
-
   useEffect(() => {
     let filtered = filterTeams(teams, { selectedVersion, searchTerm });
     filtered = sortTeams(filtered, sortBy, sortOrder);

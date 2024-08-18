@@ -78,7 +78,6 @@ const customComponents = {
   th: ({ node, ...props }: { node: Element }) => <TableHead {...props} />,
   td: ({ node, ...props }: { node: Element }) => <TableCell {...props} />,
   img: ({ node, ...props }: { node: Element }) => (
-    console.log(props),
     (
       <img
         className="rounded-md shadow-sm my-4 max-w-full h-auto"

@@ -29,7 +29,6 @@ export async function signInWithDiscord({pathname = "/"}: {pathname: string}) {
 }
 
 export async function signOut() {
-  console.log("Signing out");
   const supabase = createClient();
   const { error } = await supabase.auth.signOut();
 

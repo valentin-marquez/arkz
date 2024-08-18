@@ -39,7 +39,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <CloudflareWebAnalyticsProvider
-        token={process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN ?? ""}
+        token={process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN || ""}
+        enabled={
+          process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN !== undefined
+        }
       />
       <ThemeProvider
         defaultTheme="default"

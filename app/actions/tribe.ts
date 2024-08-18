@@ -51,8 +51,6 @@ export async function fetchTribeTowerData(
 
   if (versionsError) throw versionsError;
 
-  console.log("Tribe Tower Data", teamsWithNikkes);
-
   return {
     tower: towerData as Tables<"tribe_towers">,
     teams: teamsWithNikkes,

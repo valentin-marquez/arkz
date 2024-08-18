@@ -39,8 +39,6 @@ export async function submitInterceptionTeam(
 }> {
   const supabase = createClient();
 
-  console.log("Received submission data:", JSON.stringify(submission, null, 2));
-
   try {
     // Validate the submission data
     InterceptionTeamSubmissionSchema.parse(submission);
@@ -66,8 +64,6 @@ export async function submitInterceptionTeam(
         p_nikkes: submission.nikkes,
       })
       .single();
-
-    console.log("submitInterceptionTeam", data, error);
 
     if (error) {
       console.error("Error submitting interception team:", error);
@@ -99,7 +95,6 @@ export async function submitInterceptionTeam(
   } catch (error) {
     console.error("Error submitting interception team:", error);
     if (error instanceof z.ZodError) {
-      console.log("Zod error:", error.errors);
       return {
         status: "error",
         message: `Oops! There's an issue with your team data: ${error.name}. Can you double-check and try again? 🕵️‍♀️`,

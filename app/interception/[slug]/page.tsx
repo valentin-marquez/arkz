@@ -37,8 +37,6 @@ async function fetchBossData(slug: string): Promise<{
     .select("*")
     .eq("slug", slug);
 
-  console.log("teams", teams);
-
   if (teamsError) throw teamsError;
 
   const teamsWithNikkes = await Promise.all(
@@ -56,9 +54,6 @@ async function fetchBossData(slug: string): Promise<{
     })
   );
 
-  console.log("teamsWithNikkes", teamsWithNikkes);
-
-  // Fetch the game versions
   const { data: versions, error: versionsError } = await supabase
     .from("game_versions")
     .select("*")
@@ -80,10 +75,6 @@ export default async function InterceptionBossPage({
 }) {
   const { slug } = params;
   const { boss, teams, versions } = await fetchBossData(slug);
-
-  console.log("boss", boss);
-  console.log("teams", teams);
-  console.log("versions", versions);
 
   if (!boss) {
     return <div>Boss not found.</div>;
