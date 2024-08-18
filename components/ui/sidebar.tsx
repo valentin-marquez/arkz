@@ -146,7 +146,7 @@ const Sidebar: React.FC = () => {
       <div className="p-2 flex justify-center items-center overflow-hidden border-b border-border">
         <div className="flex select-none group cursor-pointer items-center">
           <Image
-            alt="Victorix Logo"
+            alt="Arkz Logo"
             src={
               mappingLogoThemes[theme as keyof typeof mappingLogoThemes] ||
               "/logo-black.png"
@@ -164,7 +164,7 @@ const Sidebar: React.FC = () => {
                 exit={{ opacity: 0, x: -28 }}
                 transition={{ type: "spring", bounce: 0.05, duration: 0.25 }}
               >
-                Victorix
+                Arkz
               </motion.h1>
             )}
           </AnimatePresence>

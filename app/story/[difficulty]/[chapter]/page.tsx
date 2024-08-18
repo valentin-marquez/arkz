@@ -24,7 +24,7 @@ export async function generateMetadata({
   const { difficulty, chapter } = params;
 
   return {
-    title: `Victorix - Nikke Chapter ${chapter} Guide | ${difficulty} Difficulty`,
+    title: `Arkz - Nikke Chapter ${chapter} Guide | ${difficulty} Difficulty`,
     description: `Conquer Chapter ${chapter} in Nikke: Goddess of Victory with our in-depth strategies and team compositions for ${difficulty} difficulty. Maximize your squad’s potential and dominate every challenge.`,
   };
 }

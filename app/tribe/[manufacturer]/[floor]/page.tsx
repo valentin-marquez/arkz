@@ -23,7 +23,7 @@ export async function generateMetadata({
   const { manufacturer, floor } = params;
 
   return {
-    title: `Victorix - ${manufacturer} Tribe Tower Guide | Floor ${floor} Strategy & Team Comps`,
+    title: `Arkz - ${manufacturer} Tribe Tower Guide | Floor ${floor} Strategy & Team Comps`,
     description: `Master Floor ${floor} of the ${manufacturer} Tribe Tower in Nikke: Goddess of Victory with top-tier team compositions and strategies. Explore optimized setups to ensure your victory in every battle.`,
   };
 }

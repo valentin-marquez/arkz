@@ -81,7 +81,7 @@ export async function generateMetadata({
   return {
     title: `${
       boss?.name || "Interception Boss"
-    } Guide - Victorix | Nikke: Goddess of Victory`,
+    } Guide - Arkz | Nikke: Goddess of Victory`,
     description: `Defeat ${
       boss?.name || "this boss"
     } in the Interception mode of Nikke: Goddess of Victory. Learn the best strategies, team compositions, and tips to conquer ${

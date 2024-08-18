@@ -15,8 +15,8 @@ const fontSans = FontSans({
   variable: "--font-sans",
 });
 
-const title = "Victorix";
-const description = "Victorix is a Team Database for nikke players.";
+const title = "Arkz";
+const description = "Arkz is a Team Database for nikke players.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
