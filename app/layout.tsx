@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import Sidebar from "@/components/ui/sidebar";
 import { AuthProvider } from "@/providers/auth-provider";
+import CloudflareWebAnalyticsProvider from "next-cloudflare-web-analytics";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -37,6 +38,9 @@ export default function RootLayout({
 }: PropsWithChildren): JSX.Element {
   return (
     <html lang="en" suppressHydrationWarning>
+      <CloudflareWebAnalyticsProvider
+        token={process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN ?? ""}
+      />
       <ThemeProvider
         defaultTheme="default"
         enableColorScheme
