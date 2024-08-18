@@ -1,3 +1,16 @@
+CREATE TABLE nikkes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL UNIQUE,
+    icon_url TEXT NOT NULL,
+    full_image_url TEXT NOT NULL,
+    rarity VARCHAR(50) NOT NULL,
+    element VARCHAR(50) NOT NULL,
+    weapon_type VARCHAR(50) NOT NULL,
+    burst VARCHAR(10) NOT NULL,
+    manufacturer VARCHAR(255) NOT NULL
+);
+
 create table
   public.bosses (
     id uuid not null default extensions.uuid_generate_v4 (),
