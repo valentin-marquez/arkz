@@ -4,7 +4,7 @@ import { useCharacterStore } from "@/lib/store/character-store";
 import { useTeamStore } from "@/lib/store/team-store";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/providers/auth-provider";
-import { submitStoryTeam } from "@/app/story/actions";
+import { submitStoryTeam } from "@/app/(web)/story/actions";
 import GenericSubmitTeam from "@/components/base/generic-submit-team";
 import CharacterCard from "@/components/character-card";
 import { z } from "zod";

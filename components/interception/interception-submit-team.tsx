@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useCharacterStore } from "@/lib/store/character-store";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/providers/auth-provider";
-import { submitInterceptionTeam } from "@/app/interception/actions";
+import { submitInterceptionTeam } from "@/app/(web)/interception/actions";
 import GenericSubmitTeam from "@/components/base/generic-submit-team";
 import CharacterCard from "@/components/character-card";
 import { z } from "zod";
