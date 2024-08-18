@@ -127,3 +127,17 @@ export const InterceptionTeamSubmissionSchema = z.object({
 export type InterceptionTeamSubmission = z.infer<
   typeof InterceptionTeamSubmissionSchema
 >;
+
+export const nikkeSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().min(1, "Slug is required"),
+  rarity: z.enum(["SSR", "SR", "R"]),
+  element: z.enum(["Water", "Iron", "Wind", "Fire", "Electric"]),
+  weapon_type: z.enum(["AR", "MG", "RL", "SG", "SMG", "SR"]),
+  burst: z.enum(["1", "2", "3", "p"]),
+  manufacturer: z.enum(["Abnormal", "Elysion", "Missilis", "Pilgrim", "Tetra"]),
+  icon_url: z.string().url("Invalid icon URL"),
+  full_image_url: z.string().url("Invalid full image URL"),
+});
+
+export type NikkeFormData = z.infer<typeof nikkeSchema>;

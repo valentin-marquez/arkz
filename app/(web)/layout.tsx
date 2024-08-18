@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Anek_Latin as FontSans } from "next/font/google";
+import { Red_Hat_Display as FontSans } from "next/font/google";
 import "@/styles/globals.css";
 import { cn, getURL } from "@/lib/utils";
 import { PropsWithChildren } from "react";
@@ -71,6 +71,7 @@ export default function RootLayout({
           "red-hood",
           "dark-red-hood",
         ]}
+        enableSystem={false}
       >
         <AuthProvider>
           <FramerProvider>
