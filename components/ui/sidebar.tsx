@@ -38,7 +38,7 @@ import SettingsDialog from "@/components/ui/settings";
 import { signInWithDiscord, signOut } from "@/app/actions/auth";
 import { useAuth } from "@/providers/auth-provider";
 import { createClient } from "@/lib/supabase/client";
-import { mappingLogoThemes } from "@/lib/utils";
+import { isDarkTheme } from "@/lib/utils";
 
 type SidebarOption = {
   icon: React.ElementType;
@@ -67,13 +67,11 @@ const Sidebar: React.FC = () => {
   const pathname = usePathname();
   const { user, isLoading, signOut, signIn } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isDark, setIsDark] = useState(true);
 
-  const isDark =
-    theme?.toString().includes("dark") || theme?.toString() === "default"
-      ? true
-      : false;
-
-  console.log(isDark);
+  useEffect(() => {
+    setIsDark(isDarkTheme(theme));
+  }, [theme]);
 
   const sidebarVariants = {
     open: {
@@ -128,6 +126,17 @@ const Sidebar: React.FC = () => {
 
   return (
     <MotionConfig transition={{ type: "spring", bounce: 0.05, duration: 0.25 }}>
+      <motion.div
+        className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
+        initial={false}
+        animate={!isCollapsed ? "open" : "closed"}
+        variants={{
+          open: { opacity: 1, display: "block" },
+          closed: { opacity: 0, transitionEnd: { display: "none" } },
+        }}
+        transition={{ duration: 0.3 }}
+        onClick={() => setIsCollapsed(true)}
+      />
       <motion.aside
         initial={false}
         animate={isCollapsed ? "closed" : "open"}
@@ -348,7 +357,26 @@ const Sidebar: React.FC = () => {
                             !isCollapsed && "mr-2"
                           )}
                         />
-                        {!isCollapsed && <span>Login with Discord</span>}
+                        {!isCollapsed && (
+                          <motion.span
+                            className={cn("ml-3 text-sm whitespace-nowrap")}
+                            initial={{ opacity: 0, width: 0 }}
+                            variants={{
+                              open: { opacity: 1, x: 0 },
+                              closed: { opacity: 0, x: -10 },
+                            }}
+                            animate={{ opacity: 1, width: "auto" }}
+                            exit={{ opacity: 0, width: 0 }}
+                            transition={{
+                              type: "spring",
+                              bounce: 0.05,
+                              duration: 0.25,
+                            }}
+                            style={{ display: isCollapsed ? "none" : "block" }}
+                          >
+                            Login with Discord
+                          </motion.span>
+                        )}
                       </>
                     )}
                   </Button>
@@ -391,7 +419,7 @@ const OptionContent: React.FC<{
         transition={{ duration: 0.3 }}
       >
         <option.icon
-          className={cn("w-5 h-5 flex-shrink-0", isActive && "text-primary")}
+          className={cn("w-5 h-5 flex-shrink-0", isActive && "text-neutral")}
         />
       </motion.div>
       <AnimatePresence mode="sync">

@@ -29,11 +29,6 @@ export const getURL = (path: string = "") => {
   return path ? `${url}/${path}` : url;
 };
 
-export const mappingLogoThemes = {
-  default: "/logo-white.png",
-  light: "/logo-black.png",
-  dorothy: "/logo-black.png",
-  "dark-dorothy": "/logo-white.png",
-  "red-hood": "/logo-black.png",
-  "dark-red-hood": "/logo-white.png",
-};
+export function isDarkTheme(theme: string | undefined): boolean {
+  return theme?.includes("dark") || theme?.includes("default") ? true : false;
+}

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { getMediaURL } from "@/lib/supabase/utils";
 import Link from "next/link";
 import { m as motion } from "framer-motion";
+import { useTheme } from "next-themes";
 
 type CharacterProps = {
   id: string;
@@ -31,6 +32,12 @@ const CharacterCard: React.FC<CharacterProps> = ({
   isLink = false,
   onClick,
 }) => {
+  const { theme } = useTheme();
+  const isDark =
+    theme?.toString().includes("dark") || theme?.toString() === "default"
+      ? true
+      : false;
+
   const cardContent = (
     <Card className={`w-full overflow-hidden border-2`}>
       <CardContent className="p-3 flex items-center space-x-3">
@@ -75,6 +82,7 @@ const CharacterCard: React.FC<CharacterProps> = ({
               height={20}
               placeholder="empty"
               blurDataURL="/placeholder-image.png"
+              className={isDark ? "" : "filter invert"}
             />
           </div>
         </div>

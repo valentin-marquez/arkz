@@ -20,9 +20,6 @@ import { m as motion } from "framer-motion";
 
 const SettingsDialog = () => {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   const themeMapping: Record<string, string> = {
     default: "Dark (Default)",
