@@ -18,6 +18,15 @@ const nextConfig = {
       },
     ],
   },
+  redirects: async () => {
+    return [
+      {
+        source: "/help",
+        destination: `https://${process.env.VERCEL_GIT_PROVIDER}.com/${process.env.VERCEL_GIT_REPO_OWNER}/${process.env.VERCEL_GIT_REPO_SLUG}`,
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default withBundleAnalyzer({
