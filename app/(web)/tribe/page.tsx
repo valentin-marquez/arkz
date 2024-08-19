@@ -9,7 +9,6 @@ export const metadata: Metadata = {
     "Find the best team compositions to dominate every Tribe Tower in Nikke: Goddess of Victory. Explore top strategies and optimize your teams for each challenge.",
 };
 
-
 async function getTowersData(): Promise<{
   towers: Tables<"tribe_towers">[];
 }> {
@@ -54,14 +53,17 @@ function isTowerAvailable(tower: Tables<"tribe_towers">): boolean {
     "Saturday",
   ];
 
+  // Saturday (UTC) is always available
   if (utcDay === 6) return true;
 
+  // Check if the tower is available today
   if (tower.available_days.includes(daysOfWeek[utcDay])) {
     if (now >= resetDate) {
       return true;
     }
   }
 
+  // Check if the tower was available yesterday and it's before today's reset
   const yesterdayIndex = (utcDay - 1 + 7) % 7;
   if (tower.available_days.includes(daysOfWeek[yesterdayIndex])) {
     if (now < resetDate) {

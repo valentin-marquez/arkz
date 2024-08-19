@@ -41,12 +41,13 @@ const CharacterCard: React.FC<CharacterProps> = ({
           <Image
             src={getMediaURL(icon_url, "media")}
             alt={name}
-            layout="fill"
-            objectFit="cover"
+            style={{ objectFit: "cover" }}
             className="rounded-md"
             draggable={false}
             placeholder="blur"
             blurDataURL="/placeholder-image.png"
+            sizes="(max-width: 640px) 100vw, 200px"
+            fill
           />
         </motion.div>
         <div className="flex-grow">
@@ -86,7 +87,7 @@ const CharacterCard: React.FC<CharacterProps> = ({
       <Link href={`/character/${slug}`} className="block">
         <motion.div
           whileHover={{ scale: 1.02 }}
-          transition={{ type: "spring", stiffness: 400 }}
+          transition={{ type: "spring", bounce: 0.05, duration: 0.25 }}
         >
           {cardContent}
         </motion.div>
@@ -96,7 +97,7 @@ const CharacterCard: React.FC<CharacterProps> = ({
     return (
       <motion.div
         whileHover={{ scale: 1.02 }}
-        transition={{ type: "spring", stiffness: 400 }}
+        transition={{ type: "spring", bounce: 0.05, duration: 0.25 }}
         onClick={onClick}
       >
         {cardContent}

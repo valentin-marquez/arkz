@@ -17,7 +17,7 @@ import CharacterCard from "@/components/character-card";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Database } from "@/lib/types/database.types";
-import { m as motion } from "framer-motion";
+import { m as motion, LayoutGroup } from "framer-motion";
 import { getMediaURL } from "@/lib/supabase/utils";
 import SkeletonLoader from "./skeletons/character-card-skeleton";
 import CharacterCardSkeleton from "./skeletons/character-card-skeleton";
@@ -239,12 +239,14 @@ export default function CharacterContainer({
       </Card>
       <motion.div
         layout
+        transition={{ type: "spring", bounce: 0.05, duration: 0.25 }}
         className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
       >
         {filteredCharacters.map((character) => (
           <div key={character.id}>
-            {/* <CharacterCard {...character} /> */}
-            <CharacterCard {...character} />
+            <Suspense fallback={<CharacterCardSkeleton />}>
+              <CharacterCard {...character} />
+            </Suspense>
           </div>
         ))}
       </motion.div>

@@ -60,34 +60,38 @@ export default function RootLayout({
           process.env.NEXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN !== undefined
         }
       />
-      <ThemeProvider
-        defaultTheme="default"
-        enableColorScheme
-        disableTransitionOnChange
-        themes={[
-          "default",
-          "dorothy",
-          "dark-dorothy",
-          "red-hood",
-          "dark-red-hood",
-        ]}
-        enableSystem={false}
-      >
-        <AuthProvider>
-          <FramerProvider>
-            <body
-              className={cn(
-                "flex min-h-screen bg-background font-sans antialiased *:select-none",
-                fontSans.variable
-              )}
+      <AuthProvider>
+        <FramerProvider>
+          <body
+            className={cn(
+              "flex min-h-screen bg-background font-sans antialiased *:select-none ",
+              fontSans.variable
+            )}
+          >
+            <ThemeProvider
+              defaultTheme="default"
+              enableColorScheme
+              disableTransitionOnChange
+              themes={[
+                "default",
+                "dorothy",
+                "dark-dorothy",
+                "red-hood",
+                "dark-red-hood",
+              ]}
+              enableSystem={false}
             >
-              <Sidebar />
-              <main className="flex-1 p-4 overflow-auto">{children}</main>
+              <div className="flex w-full">
+                <div className="w-16 flex-shrink-0 sticky z-50">
+                  <Sidebar />
+                </div>
+                <main className="flex-1 p-4 overflow-auto">{children}</main>
+              </div>
               <Toaster />
-            </body>
-          </FramerProvider>
-        </AuthProvider>
-      </ThemeProvider>
+            </ThemeProvider>
+          </body>
+        </FramerProvider>
+      </AuthProvider>
     </html>
   );
 }

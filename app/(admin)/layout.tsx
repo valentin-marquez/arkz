@@ -19,26 +19,26 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <ThemeProvider
-        defaultTheme="default"
-        enableColorScheme
-        disableTransitionOnChange
-        enableSystem={false}
-        themes={["default"]}
+      <body
+        className={cn(
+          "flex min-h-screen bg-background font-sans antialiased *:select-none",
+          fontSans.variable
+        )}
       >
-        <body
-          className={cn(
-            "flex min-h-screen bg-background font-sans antialiased *:select-none",
-            fontSans.variable
-          )}
+        <ThemeProvider
+          defaultTheme="default"
+          enableColorScheme
+          disableTransitionOnChange
+          enableSystem={false}
+          themes={["default"]}
         >
           <div className="flex min-h-screen">
             <Sidebar items={routes} />
             <main className="flex-1 overflow-y-auto p-8">{children}</main>
             <Toaster />
           </div>
-        </body>
-      </ThemeProvider>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

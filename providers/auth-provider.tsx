@@ -9,7 +9,9 @@ import { setCookie, getCookie, deleteCookie } from "cookies-next";
 
 type AuthContextType = {
   user: User | null;
+  isLoading: boolean;
   signOut: () => Promise<void>;
+  signIn: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -18,6 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   const handleSetCookie = (name: string, value: string, days: number) => {
@@ -36,57 +39,76 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        switch (event) {
-          case "INITIAL_SESSION":
-          case "SIGNED_IN":
-            if (session?.user) {
-              setUser(session.user);
-              const welcomeShown = handleGetCookie("welcomeShown");
-              if (!welcomeShown) {
-                toast({
-                  title: "🔓 Signed In!",
-                  description: `Welcome back, ${session.user.user_metadata.full_name}!`,
-                  duration: 3000,
-                });
-                handleSetCookie("welcomeShown", "true", 1); // Set cookie to expire in 1 day
-              }
-            }
-            break;
-          case "SIGNED_OUT":
-            setUser(null);
-            handleDeleteCookie("welcomeShown");
-            toast({
-              title: "🔒 Signed Out",
-              description: "You have been signed out. See you later!",
-              duration: 3000,
-            });
-            break;
-          default:
-            break;
-        }
-      }
-    );
-
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const initializeAuth = async () => {
+      setIsLoading(true);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
-    });
+      setIsLoading(false);
 
-    return () => {
-      authListener.subscription.unsubscribe();
+      const { data: authListener } = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          setIsLoading(true);
+          switch (event) {
+            case "SIGNED_IN":
+              if (session?.user) {
+                setUser(session.user);
+                const welcomeShown = handleGetCookie("welcomeShown");
+                if (!welcomeShown) {
+                  toast({
+                    title: "🔓 Signed In!",
+                    description: `Welcome back, ${session.user.user_metadata.full_name}!`,
+                    duration: 3000,
+                  });
+                  handleSetCookie("welcomeShown", "true", 1);
+                }
+              }
+              break;
+            case "SIGNED_OUT":
+              setUser(null);
+              handleDeleteCookie("welcomeShown");
+              toast({
+                title: "🔒 Signed Out",
+                description: "You have been signed out. See you later!",
+                duration: 3000,
+              });
+              break;
+            default:
+              break;
+          }
+          setIsLoading(false);
+        }
+      );
+
+      return () => {
+        authListener.subscription.unsubscribe();
+      };
     };
+
+    initializeAuth();
   }, [router, supabase, toast]);
 
   const signOut = async () => {
+    setIsLoading(true);
     await supabase.auth.signOut();
     setUser(null);
     handleDeleteCookie("welcomeShown");
+    setIsLoading(false);
+  };
+
+  const signIn = async () => {
+    setIsLoading(true);
+    await supabase.auth.signInWithOAuth({
+      provider: "discord",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
   };
 
   return (
-    <AuthContext.Provider value={{ user, signOut }}>
+    <AuthContext.Provider value={{ user, isLoading, signOut, signIn }}>
       {children}
     </AuthContext.Provider>
   );
