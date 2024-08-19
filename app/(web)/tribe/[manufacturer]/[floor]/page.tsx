@@ -10,7 +10,6 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import Loading from "@/components/ui/loading";
 import TribeTowerSubmitTeamModal from "@/components/tribe/tribe-submit-team-modal";
 import { fetchTribeTowerData } from "@/app/actions/tribe";
 import { Metadata, ResolvingMetadata } from "next";
@@ -73,24 +72,20 @@ export default async function Page({
       <Card className="container mx-auto w-full p-0">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle>Teams</CardTitle>
-          <Suspense fallback={<Loading />}>
-            <TribeTowerSubmitTeamModal
-              towerId={data.tower.id}
-              towerName={data.tower.name}
-              floor={floorNumber}
-              allowCharacterRepeat={false}
-              versions={data.versions}
-              manufacturer={manufacturer}
-            />
-          </Suspense>
+          <TribeTowerSubmitTeamModal
+            towerId={data.tower.id}
+            towerName={data.tower.name}
+            floor={floorNumber}
+            allowCharacterRepeat={false}
+            versions={data.versions}
+            manufacturer={manufacturer}
+          />
         </CardHeader>
         <CardContent className="p-4 pt-0 xl:p-6">
-          <Suspense fallback={<Loading />}>
-            <TribeTowerTeamList
-              initialTeams={data.teams}
-              versions={data.versions}
-            />
-          </Suspense>
+          <TribeTowerTeamList
+            initialTeams={data.teams}
+            versions={data.versions}
+          />
         </CardContent>
       </Card>
     </main>

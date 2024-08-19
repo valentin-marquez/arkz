@@ -1,7 +1,5 @@
-import { Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
-import Loading from "@/components/ui/loading";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -148,13 +146,11 @@ export default async function InterceptionBossPage({
           />
         </CardHeader>
         <CardContent className="p-4 pt-0 xl:p-6">
-          <Suspense fallback={<Loading />}>
-            <InterceptionTeamList
-              initialTeams={teams}
-              versions={versions}
-              boss={boss}
-            />
-          </Suspense>
+          <InterceptionTeamList
+            initialTeams={teams}
+            versions={versions}
+            boss={boss}
+          />
         </CardContent>
       </Card>
     </main>

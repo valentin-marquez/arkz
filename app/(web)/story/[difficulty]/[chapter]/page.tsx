@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/server";
-import Loading from "@/components/ui/loading";
 import StorySubmitTeamModal from "@/components/story/story-submit-team-modal";
 import { Tables } from "@/lib/types/database.types";
 import { Metadata } from "next";
@@ -150,9 +149,7 @@ export default async function Page({
           />
         </CardHeader>
         <CardContent className="p-4 pt-0 xl:p-6">
-          <Suspense fallback={<Loading />}>
-            <StoryTeamList initialTeams={data.teams} versions={data.versions} />
-          </Suspense>
+          <StoryTeamList initialTeams={data.teams} versions={data.versions} />
         </CardContent>
       </Card>
     </main>
