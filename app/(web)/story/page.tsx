@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { StoryPageClient } from "@/components/story/story-page";
+import { StoryPage } from "@/components/story/story-page";
 import { Tables } from "@/lib/types/database.types";
 import type { Metadata } from "next";
 
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "Dive into the captivating story of Nikke: Goddess of Victory. Explore detailed chapter guides, uncover plot twists, and relive the epic narrative through Arkz's comprehensive story breakdown.",
 };
 
-export default async function StoryPage() {
+export default async function Page() {
   const supabase = createClient();
   const { data: chapters, error } = await supabase.from("chapters").select("*");
 
@@ -18,5 +18,5 @@ export default async function StoryPage() {
     return <div>Error loading chapters</div>;
   }
 
-  return <StoryPageClient initialChapters={chapters as Tables<"chapters">[]} />;
+  return <StoryPage initialChapters={chapters as Tables<"chapters">[]} />;
 }

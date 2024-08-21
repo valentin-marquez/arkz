@@ -1,4 +1,4 @@
-// story-store.ts
+"use client";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Difficulty, SortBy } from "@/lib/types";
@@ -14,8 +14,10 @@ interface StoryStore {
   hasMore: boolean;
   sortBy: SortBy;
   setSortBy: (sortBy: SortBy) => void;
-  searchTerm: string;
-  setSearchTerm: (searchTerm: string) => void;
+  normalSearchTerm: string;
+  setNormalSearchTerm: (searchTerm: string) => void;
+  hardSearchTerm: string;
+  setHardSearchTerm: (searchTerm: string) => void;
   completedChapters: string[];
   toggleChapterCompletion: (chapterId: string) => void;
 }
@@ -27,7 +29,17 @@ export const useStoryStore = create<StoryStore>()(
     (set, get) => ({
       difficulty: "normal",
       setDifficulty: (difficulty) => {
-        const { chapters, searchTerm, sortBy } = get();
+        const {
+          chapters,
+          normalSearchTerm,
+          hardSearchTerm,
+          sortBy,
+          setNormalSearchTerm,
+          setHardSearchTerm,
+        } = get();
+        const searchTerm =
+          difficulty === "normal" ? normalSearchTerm : hardSearchTerm;
+
         const filteredAndSortedChapters = chapters
           .filter(
             (chapter) =>
@@ -53,39 +65,29 @@ export const useStoryStore = create<StoryStore>()(
       },
       chapters: [],
       setChapters: (chapters) => {
-        const { difficulty, searchTerm, sortBy } = get();
-        const filteredAndSortedChapters = chapters
-          .filter(
-            (chapter) =>
-              chapter.difficulty === difficulty &&
-              chapter.title.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-          .sort((a, b) => {
-            if (sortBy === "chapter_number") {
-              return a.chapter_number - b.chapter_number;
-            } else {
-              return a.title.localeCompare(b.title);
-            }
-          });
-
-        set({
-          chapters,
-          filteredChapters: filteredAndSortedChapters.slice(
-            0,
-            CHAPTERS_PER_PAGE
-          ),
-          hasMore: filteredAndSortedChapters.length > CHAPTERS_PER_PAGE,
-        });
+        set({ chapters });
       },
       filteredChapters: [],
       loadMore: () => {
-        const { chapters, filteredChapters, difficulty, sortBy, searchTerm } =
-          get();
+        const {
+          chapters,
+          filteredChapters,
+          difficulty,
+          sortBy,
+          normalSearchTerm,
+          hardSearchTerm,
+        } = get();
         const filteredAndSortedChapters = chapters
           .filter(
             (chapter) =>
               chapter.difficulty === difficulty &&
-              chapter.title.toLowerCase().includes(searchTerm.toLowerCase())
+              chapter.title
+                .toLowerCase()
+                .includes(
+                  difficulty === "normal"
+                    ? normalSearchTerm.toLowerCase()
+                    : hardSearchTerm.toLowerCase()
+                )
           )
           .sort((a, b) => {
             if (sortBy === "chapter_number") {
@@ -108,8 +110,11 @@ export const useStoryStore = create<StoryStore>()(
       hasMore: true,
       sortBy: "chapter_number",
       setSortBy: (sortBy) => set({ sortBy }),
-      searchTerm: "",
-      setSearchTerm: (searchTerm) => set({ searchTerm }),
+      normalSearchTerm: "",
+      setNormalSearchTerm: (searchTerm) =>
+        set({ normalSearchTerm: searchTerm }),
+      hardSearchTerm: "",
+      setHardSearchTerm: (searchTerm) => set({ hardSearchTerm: searchTerm }),
       completedChapters: [],
       toggleChapterCompletion: (chapterId) =>
         set((state) => ({

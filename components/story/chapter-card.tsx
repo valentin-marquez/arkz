@@ -1,28 +1,24 @@
 "use client";
-
+"use client";
 import React from "react";
 import { m as motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import Image from "next/image";
 import Link from "next/link";
-
-import { useStoryStore } from "@/lib/store/story-store";
 import { getMediaURL } from "@/lib/supabase/utils";
 import { Tables } from "@/lib/types/database.types";
+import { Difficulty } from "@/lib/types";
 
-export const ChapterCard = ({ chapter }: { chapter: Tables<"chapters"> }) => {
-  const { difficulty, completedChapters, toggleChapterCompletion } =
-    useStoryStore();
-  const isCompleted = completedChapters.includes(chapter.id);
+interface ChapterCardProps {
+  chapter: Tables<"chapters">;
+  currentDifficulty: Difficulty;
+}
 
-  // Function to handle checkbox click
-  const handleCheckboxClick = (event: React.MouseEvent) => {
-    event.stopPropagation(); // Prevent the click from bubbling up to the link
-    toggleChapterCompletion(chapter.id);
-  };
-
+export const ChapterCard: React.FC<ChapterCardProps> = ({
+  chapter,
+  currentDifficulty,
+}) => {
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
@@ -33,7 +29,7 @@ export const ChapterCard = ({ chapter }: { chapter: Tables<"chapters"> }) => {
       }}
     >
       <Link href={`/story/${chapter.difficulty}/${chapter.chapter_number}`}>
-        <Card className={`overflow-hidden ${isCompleted ? "opacity-50" : ""}`}>
+        <Card className="overflow-hidden">
           <CardContent className="p-0 relative">
             <Image
               src={getMediaURL(chapter.image_path)}
@@ -45,23 +41,18 @@ export const ChapterCard = ({ chapter }: { chapter: Tables<"chapters"> }) => {
               blurDataURL="/placeholder-boss.gif"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-            <div className="absolute top-2 right-2">
-              <Checkbox
-                checked={isCompleted}
-                onClick={handleCheckboxClick} // Use the custom click handler
-                onCheckedChange={() => {}}
-              />
-            </div>
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <Badge
-                variant={difficulty === "hard" ? "destructive" : "secondary"}
+                variant={
+                  currentDifficulty === "hard" ? "destructive" : "secondary"
+                }
                 className="mb-2"
               >
-                Chapter {chapter.chapter_number}
+                <span>Chapter {chapter.chapter_number}</span>
               </Badge>
-              <h3 className="text-lg font-semibold text-white line-clamp-2">
+              <h4 className="text-lg font-semibold text-white line-clamp-2">
                 {chapter.title}
-              </h3>
+              </h4>
             </div>
           </CardContent>
         </Card>

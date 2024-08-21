@@ -224,7 +224,10 @@ const Sidebar: React.FC = () => {
                         size={isDesktop ? "default" : "icon"}
                         asChild
                       >
-                        <Link href={option.href}>
+                        <Link
+                          href={option.href}
+                          onClick={() => setIsCollapsed(true)}
+                        >
                           <OptionContent
                             option={option}
                             isActive={isActive(option.href)}
