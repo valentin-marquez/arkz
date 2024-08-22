@@ -15,37 +15,78 @@ const fontSans = FontSans({
   variable: "--font-sans",
 });
 
-const title = "Arkz";
-const description = "Arkz is a Team Database for nikke players.";
+const title = "Arkz: Ultimate Nikke Team Database | Goddess of Victory Guide";
+const description =
+  "Arkz is the premier team database for Nikke: Goddess of Victory players. Optimize your squads, explore character stats, and master game strategies with our comprehensive guides and tools.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
-  title,
+  title: {
+    default: title,
+    template: "%s | Arkz - Nikke: Goddess of Victory",
+  },
   description,
+  keywords:
+    "Nikke, Goddess of Victory, team builder, character database, mobile game strategy, Arkz, squad optimization",
+  authors: [
+    { name: "Arkz Team" },
+    { name: "Valentin Marquez", url: "https://nozz.dev/" },
+  ],
   openGraph: {
     title,
     description,
     url: getURL(),
-    siteName: title,
+    siteName: "Arkz",
+    images: [
+      {
+        url: getURL("/og-image.png"),
+        width: 1200,
+        height: 630,
+        alt: "Arkz: Master Your Nikke Squads",
+      },
+    ],
     type: "website",
     locale: "en_US",
   },
-  icons: {
-    icon: {
-      url: "/logo-white.png",
-      sizes: "564x564",
-    },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: [getURL("/logo.png")],
   },
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      {
+        url: "/android-chrome-192x192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        url: "/android-chrome-512x512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  manifest: "/site.webmanifest",
   robots: {
     index: true,
     follow: true,
     googleBot: {
       index: true,
       follow: true,
-      noimageindex: true, // Don't index images
-      "max-image-preview": "none", // Don't show images in search results
-      "max-snippet": 50, // Limit snippet length
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
+  },
+  alternates: {
+    canonical: getURL(),
   },
 };
 
