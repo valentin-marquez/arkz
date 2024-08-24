@@ -11,7 +11,6 @@ interface PageProps {
 export default async function ScriptPage({ params }: PageProps) {
   const { name } = params;
   const file = path.join(process.cwd(), "public/scripts", `${name}.ps1`);
-  console.log(file);
   if (!fs.existsSync(file)) {
     return notFound();
   }
