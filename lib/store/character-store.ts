@@ -7,9 +7,9 @@ import {
   Burst,
   Manufacturer,
 } from "@/lib/types";
-import { Database } from "../types/database.types";
+import { Tables } from "../types/database.types";
 
-const applyFilters = (state: CharacterState): Database["public"]["Tables"]["nikkes"]["Row"][] => {
+const applyFilters = (state: CharacterState): Tables<"nikkes">[] => {
   return state.characters.filter((character) => {
     const matchesFilter = character.name
       .toLowerCase()

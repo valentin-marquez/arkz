@@ -42,7 +42,7 @@ export default function InterceptionSubmitTeam({
           variant: "destructive",
         });
       } else {
-        setCharacters(data);
+        setCharacters(data as Tables<"nikkes">[]);
       }
     };
 

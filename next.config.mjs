@@ -6,7 +6,7 @@ const nextConfig = {
     nextScriptWorkers: true,
   },
   images: {
-    minimumCacheTTL: 31536000,
+    minimumCacheTTL: 60 * 60 * 24 * 5,
     remotePatterns: [
       {
         protocol: "https",

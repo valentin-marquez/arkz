@@ -23,6 +23,7 @@ import SkeletonLoader from "./skeletons/character-card-skeleton";
 import CharacterCardSkeleton from "./skeletons/character-card-skeleton";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
+import { Tables } from "@/lib/types/database.types";
 
 const rarities: Rarity[] = ["R", "SR", "SSR"];
 const elements: Element[] = ["Iron", "Electric", "Fire", "Wind", "Water"];
@@ -79,7 +80,7 @@ export default function CharacterContainer({
 
   useEffect(() => {
     const fetchCharacters = async () => {
-      setCharacters(nikkes);
+      setCharacters(nikkes as Tables<"nikkes">[]);
     };
     fetchCharacters();
   }, [nikkes, setCharacters]);

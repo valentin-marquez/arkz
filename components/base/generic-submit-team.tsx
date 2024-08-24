@@ -61,7 +61,7 @@ export default function GenericSubmitTeam<T>({
       if (error) {
         console.error("Error fetching characters:", error);
       } else {
-        setCharacters(data);
+        setCharacters(data as Tables<"nikkes">[]);
       }
     };
 
