@@ -12,6 +12,7 @@ export default function Loading() {
           height={150}
           className="rounded-2xl mb-4"
           unoptimized
+          priority
         />
         <h4 className="text-xl font-semibold text-foreground">Loading...</h4>
         <p className="text-sm text-muted-foreground mt-2 flex flex-row gap-1">

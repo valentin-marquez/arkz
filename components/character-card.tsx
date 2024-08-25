@@ -55,6 +55,7 @@ const CharacterCard: React.FC<CharacterProps> = ({
             blurDataURL="/placeholder-image.png"
             sizes="(max-width: 640px) 100vw, 200px"
             fill
+            title={`Arkz - ${name}`}
           />
         </motion.div>
         <div className="flex-grow">

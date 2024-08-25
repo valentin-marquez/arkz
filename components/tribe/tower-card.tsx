@@ -91,13 +91,13 @@ const TowerCard: React.FC<TowerCardProps> = ({
           <div className="flex-grow flex items-center justify-center my-4">
             {manufacturer !== "all" ? (
               <Image
-                // src={`/Images/Manufacturers/manufacturer_${manufacturer.toLowerCase()}.webp`}
                 src={getMediaURL(
                   `/images/manufacturers/manufacturer_${manufacturer.toLowerCase()}.webp`
                 )}
                 alt={`${manufacturer} logo`}
                 width={100}
                 height={100}
+                title={`Tribe Tower - ${manufacturer} logo`}
                 className={`rounded-full
                   ${
                     // estos son los estilos dark mode
@@ -107,6 +107,7 @@ const TowerCard: React.FC<TowerCardProps> = ({
                       ? ""
                       : "filter invert"
                   }`}
+                priority
               />
             ) : (
               <div className="text-4xl font-bold text-primary dark:text-primary-foreground">

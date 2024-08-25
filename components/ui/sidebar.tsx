@@ -156,6 +156,10 @@ const Sidebar: React.FC = () => {
                 src={isDark ? "/logo-white.png" : "/logo-black.png"}
                 width={36}
                 height={36}
+                title={`Arkz - ${
+                  sidebarOptions.find((option) => option.href === pathname)
+                    ?.label
+                }`}
               />
               <AnimatePresence>
                 <motion.h1
