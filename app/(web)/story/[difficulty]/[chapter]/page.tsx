@@ -36,6 +36,7 @@ async function fetchChapterData(
   teams: any[];
   versions: Tables<"game_versions">[];
   mode: Tables<"modes">;
+  userLikes: string[];
 }> {
   const supabase = createClient();
   const chapterNumber = parseInt(chapter);
@@ -87,11 +88,27 @@ async function fetchChapterData(
 
   if (modeError || !modeData) throw modeError;
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let userLikes: string[] = [];
+  if (user) {
+    const { data: likes, error: likesError } = await supabase
+      .from("user_likes")
+      .select("team_id")
+      .eq("user_id", user.id);
+
+    if (likesError) throw likesError;
+    userLikes = likes.map((like) => like.team_id);
+  }
+
   return {
     chapter: (chapterData as Tables<"chapters">) || {},
     teams: teamsWithNikkes,
     versions: (versions as Tables<"game_versions">[]) || [],
     mode: modeData as Tables<"modes">,
+    userLikes,
   };
 }
 
@@ -149,7 +166,11 @@ export default async function Page({
           />
         </CardHeader>
         <CardContent className="p-4 pt-0 xl:p-6">
-          <StoryTeamList initialTeams={data.teams} versions={data.versions} />
+          <StoryTeamList
+            initialTeams={data.teams}
+            versions={data.versions}
+            initialUserLikes={data.userLikes}
+          />
         </CardContent>
       </Card>
     </main>

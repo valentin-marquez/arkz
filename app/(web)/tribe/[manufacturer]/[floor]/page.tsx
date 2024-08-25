@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import TribeTowerSubmitTeamModal from "@/components/tribe/tribe-submit-team-modal";
 import { fetchTribeTowerData } from "@/app/actions/tribe";
 import { Metadata, ResolvingMetadata } from "next";
+import { getURL } from "@/lib/utils";
 
 export async function generateMetadata({
   params,
@@ -21,16 +22,40 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { manufacturer, floor } = params;
 
-  if (manufacturer === "all"){
-    return {
-      title: `Arkz - Tribe Tower Guide | Floor ${floor} Strategy & Team Comps`,
-      description: `Master Floor ${floor} of the All Tribe Tower in Nikke: Goddess of Victory with top-tier team compositions and strategies. Explore optimized setups to ensure your victory in every battle.`,
-    };
-  }
+  const title =
+    manufacturer === "all"
+      ? `Arkz - Nikke Tribe Tower Guide | Floor ${floor} Strategy & Team Comps`
+      : `Arkz - ${manufacturer} Tribe Tower Guide | Floor ${floor} Strategy & Team Comps`;
+
+  const description =
+    manufacturer === "all"
+      ? `Master Floor ${floor} of the All Tribe Tower in Nikke: Goddess of Victory. Explore top-tier team compositions and strategies to dominate every battle.`
+      : `Conquer Floor ${floor} of the ${manufacturer} Tribe Tower in Nikke: Goddess of Victory. Discover optimal team setups and strategies for guaranteed victory.`;
 
   return {
-    title: `Arkz - ${manufacturer} Tribe Tower Guide | Floor ${floor} Strategy & Team Comps`,
-    description: `Master Floor ${floor} of the ${manufacturer} Tribe Tower in Nikke: Goddess of Victory with top-tier team compositions and strategies. Explore optimized setups to ensure your victory in every battle.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: getURL(`/tribe/${manufacturer}/${floor}`),
+      siteName: "Arkz",
+      images: [
+        {
+          url: getURL("/tribe-tower-og-image.png"),
+          width: 1200,
+          height: 630,
+          alt: `Nikke ${manufacturer} Tribe Tower Floor ${floor} Guide`,
+        },
+      ],
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [getURL("/tribe-tower-og-image.png")],
+    },
   };
 }
 
@@ -92,6 +117,7 @@ export default async function Page({
           <TribeTowerTeamList
             initialTeams={data.teams}
             versions={data.versions}
+            initialUserLikes={data.userLikes}
           />
         </CardContent>
       </Card>

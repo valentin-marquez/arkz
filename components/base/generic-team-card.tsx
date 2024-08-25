@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ThumbsUp, MessageCircle, Loader2, Share2 } from "lucide-react";
+import { ThumbsUp, MessageCircle, Share2 } from "lucide-react";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,19 +17,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { getMediaURL } from "@/lib/supabase/utils";
-import { useToast } from "@/components/ui/use-toast";
 import { createClient } from "@/lib/supabase/client";
-import { getURL } from "@/lib/utils";
 import TeamShortUrlGenerator from "@/components/team-short-url-generator";
 import { Tables } from "@/lib/types/database.types";
+import { useAuth } from "@/providers/auth-provider";
+import { getMediaURL } from "@/lib/supabase/utils";
 
 export interface TeamCardProps {
   id: string;
@@ -40,91 +34,209 @@ export interface TeamCardProps {
   totalVotes: number;
   comment?: string;
   metadata: Record<string, string | number>;
-  onVote: (teamId: string, voteType: "up" | "down") => void;
   renderMetadata: (
     metadata: Record<string, string | number>
   ) => React.ReactNode;
   mode: string;
+  isLiked: boolean;
 }
 
 export default function GenericTeamcard({
   id,
   user,
   members,
-  totalVotes,
+  totalVotes: initialTotalVotes,
   comment,
   metadata,
-  onVote,
   renderMetadata,
   mode,
+  isLiked: initialIsLiked,
 }: TeamCardProps) {
+  const { user: currentUser } = useAuth();
+  const supabase = createClient();
+  const [localIsLiked, setLocalIsLiked] = useState(initialIsLiked);
+  const [localTotalVotes, setLocalTotalVotes] = useState(initialTotalVotes);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`team_likes:${id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "user_likes",
+          filter: `team_id=eq.${id}`,
+        },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            if (payload.new.user_id !== currentUser?.id) {
+              setLocalTotalVotes((prev) => Math.max(0, prev + 1));
+            }
+          } else if (payload.eventType === "DELETE") {
+            if (payload.old.user_id !== currentUser?.id) {
+              setLocalTotalVotes((prev) => Math.max(0, prev - 1));
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id, supabase, currentUser]);
+
+  useEffect(() => {
+    setLocalIsLiked(initialIsLiked);
+    setLocalTotalVotes(initialTotalVotes);
+  }, [initialIsLiked, initialTotalVotes]);
+
+  const handleLike = async () => {
+    if (!currentUser || isUpdating) return;
+
+    setIsUpdating(true);
+    const newIsLiked = !localIsLiked;
+    setLocalIsLiked(newIsLiked);
+    setLocalTotalVotes((prev) => Math.max(0, newIsLiked ? prev + 1 : prev - 1));
+
+    try {
+      if (newIsLiked) {
+        await supabase
+          .from("user_likes")
+          .insert({ user_id: currentUser.id, team_id: id });
+      } else {
+        await supabase
+          .from("user_likes")
+          .delete()
+          .match({ user_id: currentUser.id, team_id: id });
+      }
+    } catch (error) {
+      // Revert local state if the API call fails
+      setLocalIsLiked(!newIsLiked);
+      setLocalTotalVotes((prev) =>
+        Math.max(0, newIsLiked ? prev - 1 : prev + 1)
+      );
+      console.error("Failed to update like:", error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
   return (
-    <Card className="w-full max-w-sm bg-card text-card-foreground">
-      <CardHeader className="p-4 pb-2 flex flex-row justify-between items-center">
-        <div className="flex items-center space-x-2">
-          <Avatar className="w-8 h-8">
-            <AvatarImage src={user.avatarUrl} alt={user.username} />
-            <AvatarFallback>{user.username[0]}</AvatarFallback>
-          </Avatar>
-          <span className="font-medium text-sm">{user.username}</span>
-        </div>
-        <TeamShortUrlGenerator teamId={id} mode={mode} />
-      </CardHeader>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card className="w-full max-w-sm bg-card text-card-foreground shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <CardHeader className="p-4 pb-2 flex flex-row justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <Avatar className="w-8 h-8">
+              <AvatarImage src={user.avatarUrl} alt={user.username} />
+              <AvatarFallback>{user.username[0]}</AvatarFallback>
+            </Avatar>
+            <span className="font-medium text-sm">{user.username}</span>
+          </div>
+          <TeamShortUrlGenerator teamId={id} mode={mode} />
+        </CardHeader>
 
-      <CardContent className="p-4 pt-2">
-        <div className="flex flex-wrap gap-2 mb-2">
-          {members
-            .sort((a, b) => a.position - b.position)
-            .map((member) => (
-              <div key={member.nikke_id} className="flex flex-col items-center">
-                <Avatar className="w-12 h-12">
-                  <AvatarImage
-                    src={getMediaURL(member.icon_url)}
-                    alt={member.name}
-                  />
-                  <AvatarFallback>{member.name}</AvatarFallback>
-                </Avatar>
-                <span className="text-xs mt-1 w-8 line-clamp-1">
-                  {member.name}
-                </span>
-              </div>
-            ))}
-        </div>
-        <div className="flex items-center justify-between mt-2">
-          {renderMetadata(metadata)}
-          <span className="text-sm font-semibold">{totalVotes} votes</span>
-        </div>
-      </CardContent>
+        <CardContent className="p-4 pt-2">
+          <motion.div
+            className="flex flex-wrap gap-2 mb-2"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: {
+                transition: {
+                  staggerChildren: 0.05,
+                },
+              },
+            }}
+          >
+            {members
+              .sort((a, b) => a.position - b.position)
+              .map((member) => (
+                <motion.div
+                  key={member.nikke_id}
+                  className="flex flex-col items-center"
+                  variants={{
+                    hidden: { opacity: 0, scale: 0.8 },
+                    visible: { opacity: 1, scale: 1 },
+                  }}
+                >
+                  <Avatar className="w-12 h-12 border-2 border-primary">
+                    <AvatarImage
+                      src={getMediaURL(member.icon_url)}
+                      alt={member.name}
+                    />
+                    <AvatarFallback>{member.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <span className="text-xs mt-1 w-12 text-center line-clamp-1">
+                    {member.name}
+                  </span>
+                </motion.div>
+              ))}
+          </motion.div>
+          <div className="flex items-center justify-between mt-2">
+            {renderMetadata(metadata)}
+            <AnimatePresence>
+              <motion.span
+                key={localTotalVotes}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="text-sm font-semibold"
+              >
+                {localTotalVotes} votes
+              </motion.span>
+            </AnimatePresence>
+          </div>
+        </CardContent>
 
-      <Separator />
-      <CardFooter className="p-2 flex justify-between">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onVote(id, "up")}
-          className="flex-1"
-        >
-          <ThumbsUp className="w-4 h-4 mr-2" />
-          Vote
-        </Button>
-        <Separator orientation="vertical" className="h-8" />
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="sm" className="flex-1">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Comment
+        <Separator />
+        <CardFooter className="p-2 flex justify-around">
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              variant={localIsLiked ? "default" : "ghost"}
+              size="sm"
+              onClick={handleLike}
+              className={`flex-1 transition-colors duration-300 ${
+                localIsLiked ? "bg-primary text-primary-foreground" : ""
+              }`}
+            >
+              <ThumbsUp
+                className={`w-4 h-4 mr-2 transition-all duration-300 ${
+                  localIsLiked ? "fill-current scale-110" : ""
+                }`}
+              />
+              {localTotalVotes} Likes
             </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Team Comment</DialogTitle>
-            </DialogHeader>
-            <div className="mt-2">
-              <p className="text-sm text-muted-foreground">{comment}</p>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </CardFooter>
-    </Card>
+          </motion.div>
+          <Separator orientation="vertical" className="h-8" />
+          <Dialog>
+            <DialogTrigger asChild>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button variant="ghost" size="sm" className="flex-1">
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Comment
+                </Button>
+              </motion.div>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Team Comment</DialogTitle>
+              </DialogHeader>
+              <div className="mt-2">
+                <p className="text-sm text-muted-foreground">{comment}</p>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </CardFooter>
+      </Card>
+    </motion.div>
   );
 }

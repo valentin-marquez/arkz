@@ -18,6 +18,7 @@ async function fetchBossData(slug: string): Promise<{
   boss: Tables<"bosses"> | null;
   teams: any[];
   versions: Tables<"game_versions">[] | [];
+  userLikes: string[];
 }> {
   const supabase = createClient();
 
@@ -60,10 +61,26 @@ async function fetchBossData(slug: string): Promise<{
 
   if (versionsError) throw versionsError;
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let userLikes: string[] = [];
+  if (user) {
+    const { data: likes, error: likesError } = await supabase
+      .from("user_likes")
+      .select("team_id")
+      .eq("user_id", user.id);
+
+    if (likesError) throw likesError;
+    userLikes = likes.map((like) => like.team_id);
+  }
+
   return {
     boss: (boss as Tables<"bosses">) || null,
     teams: teamsWithNikkes,
     versions: (versions as Tables<"game_versions">[]) || [],
+    userLikes,
   };
 }
 
@@ -94,7 +111,7 @@ export default async function InterceptionBossPage({
   params: { slug: string };
 }) {
   const { slug } = params;
-  const { boss, teams, versions } = await fetchBossData(slug);
+  const { boss, teams, versions, userLikes } = await fetchBossData(slug);
 
   if (!boss) {
     return <div>Boss not found.</div>;
@@ -150,6 +167,7 @@ export default async function InterceptionBossPage({
             initialTeams={teams}
             versions={versions}
             boss={boss}
+            initialUserLikes={userLikes}
           />
         </CardContent>
       </Card>

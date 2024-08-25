@@ -2,7 +2,6 @@
 import React from "react";
 import GenericTeamList from "../base/generic-team-list";
 import TribeTowerTeamCard from "./tribe-team-card";
-import { Database } from "@/lib/types/database.types";
 import {
   Tables,
   TeamWithNIkkesTribe,
@@ -12,16 +11,15 @@ import {
 interface TribeTowerTeamListProps {
   initialTeams: TeamWithNIkkesTribe[];
   versions: Tables<"game_versions">[];
+  initialUserLikes: string[];
 }
 
 const TribeTowerTeamList: React.FC<TribeTowerTeamListProps> = ({
   initialTeams,
   versions,
+  initialUserLikes,
 }) => {
-  const renderTeamCard = (
-    team: TeamWithNikkes,
-    onVote: (teamId: string, voteType: "up" | "down") => void
-  ) => {
+  const renderTeamCard = (team: TeamWithNikkes) => {
     const tribeTeam = team as TeamWithNIkkesTribe;
     return (
       <TribeTowerTeamCard
@@ -33,7 +31,7 @@ const TribeTowerTeamList: React.FC<TribeTowerTeamListProps> = ({
         floor={tribeTeam.floor}
         towerName={tribeTeam.tower_name}
         metadata={{ gameVersionId: tribeTeam.game_version_id }}
-        onVote={onVote}
+        isLiked={initialUserLikes.includes(tribeTeam.team_id)}
         mode="tribe_tower"
       />
     );

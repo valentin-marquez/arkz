@@ -2,29 +2,26 @@
 import React from "react";
 import GenericTeamList from "../base/generic-team-list";
 import InterceptionTeamCard from "./interception-team-card";
-import { Database } from "@/lib/types/database.types";
-// import type { TeamWithNikkes } from "@/lib/types/database.types";
 import {
   Tables,
   TeamWithNikkesInterception,
   TeamWithNikkes,
 } from "@/lib/types/database.types";
-//Database["interception_teams_with_votes"][];
+
 interface InterceptionTeamListProps {
   initialTeams: TeamWithNikkesInterception[];
   versions: Tables<"game_versions">[];
   boss: Tables<"bosses">;
+  initialUserLikes: string[];
 }
 
 const InterceptionTeamList: React.FC<InterceptionTeamListProps> = ({
   initialTeams,
   versions,
   boss,
+  initialUserLikes,
 }) => {
-  const renderTeamCard = (
-    team: TeamWithNikkes,
-    onVote: (teamId: string, voteType: "up" | "down") => void
-  ) => {
+  const renderTeamCard = (team: TeamWithNikkes) => {
     const interceptionTeam = team as TeamWithNikkesInterception;
     return (
       <InterceptionTeamCard
@@ -37,7 +34,7 @@ const InterceptionTeamList: React.FC<InterceptionTeamListProps> = ({
         totalVotes={interceptionTeam.total_votes}
         comment={interceptionTeam.comment || ""}
         metadata={{ gameVersionId: interceptionTeam.game_version_id }}
-        onVote={onVote}
+        isLiked={initialUserLikes.includes(interceptionTeam.team_id)}
         bossName={boss.name}
         mode="interception"
       />

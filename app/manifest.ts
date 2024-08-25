@@ -4,6 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Arkz - Nikke: Goddess of Victory Team Database",
     short_name: "Arkz",
+    description: "Optimize your Nikke squads with top-tier team compositions",
     start_url: "/",
     icons: [
       {
@@ -20,5 +21,7 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#0a0a0a",
     background_color: "#0a0a0a",
     display: "standalone",
+    orientation: "portrait",
+    categories: ["games", "strategy", "database"],
   };
 }

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -24,14 +24,13 @@ import Image from "next/image";
 import { Label } from "@/components/ui/label";
 import { m as motion } from "framer-motion";
 import { Tables, TeamWithNikkes } from "@/lib/types/database.types";
+import { useAuth } from "@/providers/auth-provider";
+import { createClient } from "@/lib/supabase/client";
 
 interface GenericTeamListProps<T> {
   initialTeams: TeamWithNikkes[];
   versions: Tables<"game_versions">[];
-  renderTeamCard: (
-    team: TeamWithNikkes,
-    onVote: (teamId: string, voteType: "up" | "down") => void
-  ) => React.ReactNode;
+  renderTeamCard: (team: TeamWithNikkes) => React.ReactNode;
   getTeamId: (team: TeamWithNikkes) => string;
   getTeamMembers: (team: TeamWithNikkes) => TeamWithNikkes["nikkes"];
   filterTeams: (teams: TeamWithNikkes[], filters: any) => TeamWithNikkes[];
@@ -52,6 +51,9 @@ export default function GenericTeamList<T>({
   sortTeams,
 }: GenericTeamListProps<T>) {
   const [teams, setTeams] = useState(initialTeams);
+  const { user } = useAuth();
+  const supabase = createClient();
+
   const [filteredTeams, setFilteredTeams] = useState(initialTeams);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedVersion, setSelectedVersion] = useState(
@@ -89,11 +91,6 @@ export default function GenericTeamList<T>({
       setSortBy(value);
       setSortOrder("desc");
     }
-  };
-
-  const onVote = (teamId: string, voteType: "up" | "down") => {
-    // TODO: Implement voting logic here
-    console.log(`Voted ${voteType} for team ${teamId}`);
   };
 
   const paginatedTeams = filteredTeams.slice(
@@ -180,7 +177,7 @@ export default function GenericTeamList<T>({
         className="rounded-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 place-content-center place-items-center"
       >
         {paginatedTeams.map((team) => (
-          <div key={getTeamId(team)}>{renderTeamCard(team, onVote)}</div>
+          <div key={getTeamId(team)}>{renderTeamCard(team)}</div>
         ))}
       </motion.div>
 

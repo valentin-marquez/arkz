@@ -11,6 +11,7 @@ export async function fetchTribeTowerData(
   teams: any[];
   versions: Tables<"game_versions">[];
   floor: number;
+  userLikes: string[];
 }> {
   const supabase = createClient();
 
@@ -51,10 +52,26 @@ export async function fetchTribeTowerData(
 
   if (versionsError) throw versionsError;
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let userLikes: string[] = [];
+  if (user) {
+    const { data: likes, error: likesError } = await supabase
+      .from("user_likes")
+      .select("team_id")
+      .eq("user_id", user.id);
+
+    if (likesError) throw likesError;
+    userLikes = likes.map((like) => like.team_id);
+  }
+
   return {
     tower: towerData as Tables<"tribe_towers">,
     teams: teamsWithNikkes,
     versions: versions as Tables<"game_versions">[],
     floor: floor,
+    userLikes,
   };
 }

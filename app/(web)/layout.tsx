@@ -22,19 +22,21 @@ const description =
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
   title: {
-    default: title,
+    default: "Arkz: Ultimate Nikke Team Database | Goddess of Victory Guide",
     template: "%s | Arkz - Nikke: Goddess of Victory",
   },
-  description,
+  description:
+    "Optimize your Nikke: Goddess of Victory squads with Arkz, the premier team database. Explore top-tier compositions, character stats, and game strategies for Story, Interception, and Tribe Tower modes.",
   keywords:
-    "Nikke, Goddess of Victory, team builder, character database, mobile game strategy, Arkz, squad optimization",
+    "Nikke, Goddess of Victory, team builder, character database, mobile game strategy, Arkz, squad optimization, Story mode, Interception, Tribe Tower",
   authors: [
     { name: "Arkz Team" },
     { name: "Valentin Marquez", url: "https://nozz.dev/" },
   ],
   openGraph: {
-    title,
-    description,
+    title: "Arkz: Ultimate Nikke Team Database | Goddess of Victory Guide",
+    description:
+      "Optimize your Nikke: Goddess of Victory squads with Arkz. Explore top-tier team compositions for Story, Interception, and Tribe Tower modes.",
     url: getURL(),
     siteName: "Arkz",
     images: [
@@ -50,8 +52,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title,
-    description,
+    title: "Arkz: Ultimate Nikke Team Database",
+    description:
+      "Optimize your Nikke: Goddess of Victory squads with Arkz. Explore top-tier team compositions for all game modes.",
     images: [getURL("/logo.png")],
   },
   icons: {

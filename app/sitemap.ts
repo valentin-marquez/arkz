@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getURL } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
-import { get } from "http";
 
 async function getManufacturerSites(): Promise<MetadataRoute.Sitemap> {
   const supabase = createClient();
@@ -15,10 +14,6 @@ async function getManufacturerSites(): Promise<MetadataRoute.Sitemap> {
     return [];
   }
 
-  // now y need return an array of objects like this:
-  // { url: getUrl(`/${manufacturer}/${floor_number}`), lastModified: new Date(), changeFrequency: "daily", priority: 0.8 }
-  //  entonces ncestio generar de todas las manufacturer segun el numero de max_floors
-
   return data.reduce(
     (acc: MetadataRoute.Sitemap, { manufacturer, max_floors }) => {
       for (let i = 1; i <= max_floors; i++) {
@@ -26,7 +21,7 @@ async function getManufacturerSites(): Promise<MetadataRoute.Sitemap> {
           url: getURL(`/tribe/${manufacturer}/${i}`),
           lastModified: new Date(),
           changeFrequency: "daily",
-          priority: 0.8,
+          priority: 0.8 - (i / max_floors) * 0.3,
         });
       }
       return acc;

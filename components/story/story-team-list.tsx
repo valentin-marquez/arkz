@@ -11,16 +11,15 @@ import {
 interface ChapterTeamListProps {
   initialTeams: TeamWithNikkesStory[];
   versions: Tables<"game_versions">[];
+  initialUserLikes: string[];
 }
 
 const ChapterTeamList: React.FC<ChapterTeamListProps> = ({
   initialTeams,
   versions,
+  initialUserLikes,
 }) => {
-  const renderTeamCard = (
-    team: TeamWithNikkes,
-    onVote: (teamId: string, voteType: "up" | "down") => void
-  ) => {
+  const renderTeamCard = (team: TeamWithNikkes) => {
     const storyTeam = team as TeamWithNikkesStory;
     return (
       <ChapterTeamCard
@@ -32,7 +31,7 @@ const ChapterTeamList: React.FC<ChapterTeamListProps> = ({
         chapterNumber={storyTeam.chapter_number}
         difficulty={storyTeam.difficulty}
         metadata={{ gameVersionId: storyTeam.game_version_id }}
-        onVote={onVote}
+        isLiked={initialUserLikes.includes(storyTeam.team_id)}
         mode="story"
       />
     );

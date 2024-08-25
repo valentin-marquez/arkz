@@ -2,7 +2,6 @@
 import React, { useEffect, Suspense } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -17,9 +16,8 @@ import CharacterCard from "@/components/character-card";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Database } from "@/lib/types/database.types";
-import { m as motion, LayoutGroup, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import { getMediaURL } from "@/lib/supabase/utils";
-import SkeletonLoader from "./skeletons/character-card-skeleton";
 import CharacterCardSkeleton from "./skeletons/character-card-skeleton";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
@@ -37,21 +35,41 @@ const manufacturers: Manufacturer[] = [
   "Abnormal",
 ];
 
-const FilterButton: React.FC<{
+function FilterButton({
+  active,
+  onClick,
+  children,
+}: {
   active: boolean;
   onClick: () => void;
   children: React.ReactNode;
-}> = ({ active, onClick, children }) => (
-  <Button
-    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-      active
-        ? "bg-primary text-primary-foreground"
-        : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-    }`}
-    onClick={onClick}
-  >
-    {children}
-  </Button>
+}) {
+  return (
+    <Button
+      className={cn(
+        "px-2 py-1 text-xs sm:text-sm font-medium transition-colors rounded-full",
+        active
+          ? "bg-primary text-primary-foreground"
+          : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+      )}
+      onClick={onClick}
+    >
+      {children}
+    </Button>
+  );
+}
+
+const FilterSection = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <div className="space-y-2">
+    <h2 className="text-lg font-semibold">{title}</h2>
+    <div className="flex flex-wrap gap-2">{children}</div>
+  </div>
 );
 
 export default function CharacterContainer({
@@ -77,117 +95,102 @@ export default function CharacterContainer({
   } = useCharacterStore();
 
   const { theme } = useTheme();
+  const isDark = theme?.includes("dark") || theme === "default";
 
   useEffect(() => {
-    const fetchCharacters = async () => {
-      setCharacters(nikkes as Tables<"nikkes">[]);
-    };
-    fetchCharacters();
+    setCharacters(nikkes as Tables<"nikkes">[]);
   }, [nikkes, setCharacters]);
 
-  const handleBurstChange = (burst: Burst | undefined) => {
-    setBurst(selectedBurst === burst ? undefined : burst);
-  };
-
-  const handleManufacturerChange = (manufacturer: Manufacturer | undefined) => {
-    setManufacturer(
-      selectedManufacturer === manufacturer ? undefined : manufacturer
+  const handleFilterChange = (
+    setter: (value: any) => void,
+    currentValue: any,
+    newValue: any
+  ) => {
+    setter(
+      currentValue.includes(newValue)
+        ? currentValue.filter((v: any) => v !== newValue)
+        : [...currentValue, newValue]
     );
   };
-
-  const isDark =
-    theme?.toString().includes("dark") || theme?.toString() === "default"
-      ? true
-      : false;
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Character List</h1>
       <Card className="mb-8">
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold">Rarity</h2>
-              <div className="flex flex-wrap gap-2">
-                {rarities.map((rarity) => (
-                  <FilterButton
-                    key={rarity}
-                    active={selectedRarities.includes(rarity)}
-                    onClick={() =>
-                      setRarities(
-                        selectedRarities.includes(rarity)
-                          ? selectedRarities.filter((r) => r !== rarity)
-                          : [...selectedRarities, rarity]
-                      )
-                    }
-                  >
-                    {rarity}
-                  </FilterButton>
-                ))}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold">Element</h2>
-              <div className="flex flex-wrap gap-2">
-                {elements.map((element) => (
-                  <FilterButton
-                    key={element}
-                    active={selectedElements.includes(element)}
-                    onClick={() =>
-                      setElements(
-                        selectedElements.includes(element)
-                          ? selectedElements.filter((e) => e !== element)
-                          : [...selectedElements, element]
-                      )
-                    }
-                  >
-                    <Image
-                      src={getMediaURL(
-                        `/images/elements/element_${element.toLowerCase()}.webp`
-                      )}
-                      alt={element}
-                      width={16}
-                      height={16}
-                      className="inline-block mr-1 active:invert"
-                    />
-                    {element}
-                  </FilterButton>
-                ))}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold">Weapon Type</h2>
-              <div className="flex flex-wrap gap-2">
-                {weaponTypes.map((weaponType) => (
-                  <FilterButton
-                    key={weaponType}
-                    active={selectedWeaponTypes.includes(weaponType)}
-                    onClick={() =>
-                      setWeaponTypes(
-                        selectedWeaponTypes.includes(weaponType)
-                          ? selectedWeaponTypes.filter((w) => w !== weaponType)
-                          : [...selectedWeaponTypes, weaponType]
-                      )
-                    }
-                  >
-                    <Image
-                      src={getMediaURL(
-                        `/images/weapons/weapon_${weaponType.toLowerCase()}.webp`
-                      )}
-                      alt={weaponType}
-                      width={24}
-                      height={24}
-                      className={cn("inline-block mr-1", {
-                        "filter invert": !isDark,
-                      })}
-                    />
-                    {weaponType}
-                  </FilterButton>
-                ))}
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <div className="space-y-2 flex-1">
+        <CardContent className="p-4 sm:p-6">
+          <motion.div
+            layout
+            className="space-y-4"
+            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+          >
+            <FilterSection title="Rarity">
+              {rarities.map((rarity) => (
+                <FilterButton
+                  key={rarity}
+                  active={selectedRarities.includes(rarity)}
+                  onClick={() =>
+                    handleFilterChange(setRarities, selectedRarities, rarity)
+                  }
+                >
+                  {rarity}
+                </FilterButton>
+              ))}
+            </FilterSection>
+
+            <FilterSection title="Element">
+              {elements.map((element) => (
+                <FilterButton
+                  key={element}
+                  active={selectedElements.includes(element)}
+                  onClick={() =>
+                    handleFilterChange(setElements, selectedElements, element)
+                  }
+                >
+                  <Image
+                    src={getMediaURL(
+                      `/images/elements/element_${element.toLowerCase()}.webp`
+                    )}
+                    alt={element}
+                    width={16}
+                    height={16}
+                    className="inline-block mr-1 active:invert"
+                  />
+                  <span className="hidden sm:inline">{element}</span>
+                </FilterButton>
+              ))}
+            </FilterSection>
+
+            <FilterSection title="Weapon Type">
+              {weaponTypes.map((weaponType) => (
+                <FilterButton
+                  key={weaponType}
+                  active={selectedWeaponTypes.includes(weaponType)}
+                  onClick={() =>
+                    handleFilterChange(
+                      setWeaponTypes,
+                      selectedWeaponTypes,
+                      weaponType
+                    )
+                  }
+                >
+                  <Image
+                    src={getMediaURL(
+                      `/images/weapons/weapon_${weaponType.toLowerCase()}.webp`
+                    )}
+                    alt={weaponType}
+                    width={20}
+                    height={20}
+                    className={cn("inline-block mr-1", {
+                      "filter invert": !isDark,
+                    })}
+                  />
+                  <span className="hidden sm:inline">{weaponType}</span>
+                </FilterButton>
+              ))}
+            </FilterSection>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <h2 className="text-lg font-semibold">Burst</h2>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -200,10 +203,9 @@ export default function CharacterContainer({
                     <DropdownMenuSeparator />
                     {bursts.map((burst) => (
                       <DropdownMenuCheckboxItem
-                        className="cursor-pointer"
                         key={burst}
                         checked={selectedBurst === burst}
-                        onCheckedChange={() => handleBurstChange(burst)}
+                        onCheckedChange={() => setBurst(burst)}
                       >
                         {burst}
                       </DropdownMenuCheckboxItem>
@@ -211,7 +213,8 @@ export default function CharacterContainer({
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              <div className="space-y-2 flex-1">
+
+              <div className="space-y-2">
                 <h2 className="text-lg font-semibold">Manufacturer</h2>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -224,12 +227,9 @@ export default function CharacterContainer({
                     <DropdownMenuSeparator />
                     {manufacturers.map((manufacturer) => (
                       <DropdownMenuCheckboxItem
-                        className="cursor-pointer"
                         key={manufacturer}
                         checked={selectedManufacturer === manufacturer}
-                        onCheckedChange={() =>
-                          handleManufacturerChange(manufacturer)
-                        }
+                        onCheckedChange={() => setManufacturer(manufacturer)}
                       >
                         {manufacturer}
                       </DropdownMenuCheckboxItem>
@@ -238,6 +238,7 @@ export default function CharacterContainer({
                 </DropdownMenu>
               </div>
             </div>
+
             <div className="space-y-2">
               <h2 className="text-lg font-semibold">Search</h2>
               <Input
@@ -246,21 +247,28 @@ export default function CharacterContainer({
                 onChange={(e) => setFilter(e.target.value)}
               />
             </div>
-          </div>
+          </motion.div>
         </CardContent>
       </Card>
+
       <motion.div
         layout
-        transition={{ type: "spring", bounce: 0.05, duration: 0.25 }}
-        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
+        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4"
       >
         <AnimatePresence>
           {filteredCharacters.map((character) => (
-            <div key={character.id}>
+            <motion.div
+              key={character.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3 }}
+            >
               <Suspense fallback={<CharacterCardSkeleton />}>
                 <CharacterCard {...character} />
               </Suspense>
-            </div>
+            </motion.div>
           ))}
         </AnimatePresence>
       </motion.div>
