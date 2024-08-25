@@ -2,8 +2,11 @@ import { createClient } from "@/lib/supabase/server";
 import CharacterContainer from "@/components/character-container";
 import { Suspense, cache } from "react";
 import CharacterGridSkeleton from "@/components/skeletons/character-grid-skeleton";
+import { Metadata } from "next";
 
 export const revalidate = 3600; // 1 hour
+
+
 
 const getNikkes = cache(async () => {
   const supabase = createClient();

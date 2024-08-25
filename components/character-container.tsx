@@ -115,7 +115,7 @@ export default function CharacterContainer({
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Character List</h1>
+      <h2 className="text-3xl font-bold mb-6">Character List</h2>
       <Card className="mb-8">
         <CardContent className="p-4 sm:p-6">
           <motion.div

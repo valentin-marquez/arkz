@@ -4,7 +4,7 @@ import { Tables } from "@/lib/types/database.types";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Tribe Tower - Arkz",
+  title: "Tribe Tower",
   description:
     "Find the best team compositions to dominate every Tribe Tower in Nikke: Goddess of Victory. Explore top strategies and optimize your teams for each challenge.",
 };

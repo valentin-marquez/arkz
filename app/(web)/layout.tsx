@@ -15,10 +15,6 @@ const fontSans = FontSans({
   variable: "--font-sans",
 });
 
-const title = "Arkz: Ultimate Nikke Team Database | Goddess of Victory Guide";
-const description =
-  "Arkz is the premier team database for Nikke: Goddess of Victory players. Optimize your squads, explore character stats, and master game strategies with our comprehensive guides and tools.";
-
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
   title: {
