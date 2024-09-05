@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/server";
 import StorySubmitTeamModal from "@/components/story/story-submit-team-modal";
 import { Tables } from "@/lib/types/database.types";
 import { Metadata } from "next";
+import { Header } from "@/components/ui/header";
 
 export async function generateMetadata({
   params,
@@ -119,39 +120,20 @@ export default async function Page({
 }) {
   const { difficulty, chapter } = params;
   const data = await fetchChapterData(difficulty, chapter);
-
+  const breadcrumbs = [
+    { href: "/", label: "Home" },
+    { href: "/story", label: "Story" },
+    { label: `Chapter ${chapter} (${difficulty})` },
+  ];
   return (
     <main className="flex-1 relative space-y-4">
-      <div className="flex flex-row w-full justify-between items-center">
-        <div className="flex flex-col w-full">
-          <Breadcrumb className="px-8">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">Home</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/story">Story</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage className="capitalize font-bold">
-                  Chapter {chapter} ({difficulty})
-                </BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-
-          <div className="px-8 flex flex-wrap flex-col">
-            <h1 className="text-2xl">Story</h1>
-            <p className="text-muted-foreground mt-0 capitalize text-sm">
-              Level: {difficulty} - Chapter: {chapter}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <Separator />
+      <Header
+        breadcrumbs={breadcrumbs}
+        title="Story"
+        subtitle={`Level: ${
+          difficulty.charAt(0).toUpperCase() + difficulty.slice(1)
+        } - Chapter: ${chapter}`}
+      />
 
       <Card className="container mx-auto w-full p-0">
         <CardHeader className="flex flex-row items-center justify-between pb-2">

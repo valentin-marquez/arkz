@@ -14,6 +14,7 @@ import TribeTowerSubmitTeamModal from "@/components/tribe/tribe-submit-team-moda
 import { fetchTribeTowerData } from "@/app/actions/tribe";
 import { Metadata, ResolvingMetadata } from "next";
 import { getURL } from "@/lib/utils";
+import { Header } from "@/components/ui/header";
 
 export async function generateMetadata({
   params,
@@ -68,38 +69,21 @@ export default async function Page({
   const floorNumber = parseInt(floor, 10);
   const data = await fetchTribeTowerData(manufacturer, floorNumber);
 
+  const breadcrumbs = [
+    { href: "/", label: "Home" },
+    { href: "/tribe", label: "Tribe Tower" },
+    { label: `Floor ${floor}` },
+  ];
+
   return (
     <main className="flex-1 relative space-y-4">
-      <div className="flex flex-row w-full justify-between items-center">
-        <div className="flex flex-col w-full">
-          <Breadcrumb className="px-8">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">Home</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/tribe">Tribe Tower</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage className="font-bold">
-                  Floor {floor}
-                </BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-
-          <div className="px-8 flex flex-wrap flex-col">
-            <h1 className="text-2xl w-fit">Tribe Tower</h1>
-            <p className="text-muted-foreground mt-0 capitalize text-sm">
-              {manufacturer} - Floor {floor}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <Separator />
+      <Header
+        breadcrumbs={breadcrumbs}
+        title="Tribe Tower"
+        subtitle={`${
+          manufacturer.charAt(0).toUpperCase() + manufacturer.slice(1)
+        } - Floor ${floor}`}
+      />
 
       <Card className="container mx-auto w-full p-0">
         <CardHeader className="flex flex-row items-center justify-between pb-2">

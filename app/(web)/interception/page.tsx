@@ -12,7 +12,10 @@ export const metadata: Metadata = {
 
 export default async function InterceptionPage() {
   const supabase = createClient();
-  const { data: bosses, error } = await supabase.from("bosses").select("*");
+  const { data: bosses, error } = await supabase
+    .from("bosses")
+    .select("*")
+    .eq("mode_type", "Interception");
 
   if (error) {
     console.error("Error fetching bosses:", error);

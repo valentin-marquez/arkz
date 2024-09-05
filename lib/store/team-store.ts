@@ -22,21 +22,34 @@ interface TeamState {
     toTeamIndex: number,
     toSlotIndex: number
   ) => void;
+  isNikkeUsed: (nikkeId: string) => boolean;
 }
 
-export const useTeamStore = create<TeamState>((set) => ({
-  teams: [],
+const MAX_TEAMS = 5;
+const TEAM_SIZE = 5;
+
+export const useTeamStore = create<TeamState>((set, get) => ({
+  teams: Array(MAX_TEAMS).fill(Array(TEAM_SIZE).fill(null)),
   setTeams: (teams) => set({ teams }),
   addNikkeToTeam: (nikke, teamIndex, slotIndex) =>
     set((state) => {
-      const newTeams = [...state.teams];
-      newTeams[teamIndex][slotIndex] = nikke;
+      if (teamIndex >= MAX_TEAMS || state.isNikkeUsed(nikke.id)) {
+        return state;
+      }
+      const newTeams = state.teams.map((team, index) =>
+        index === teamIndex
+          ? team.map((slot, idx) => (idx === slotIndex ? nikke : slot))
+          : team
+      );
       return { teams: newTeams };
     }),
   removeNikkeFromTeam: (teamIndex, slotIndex) =>
     set((state) => {
-      const newTeams = [...state.teams];
-      newTeams[teamIndex][slotIndex] = null;
+      const newTeams = state.teams.map((team, index) =>
+        index === teamIndex
+          ? team.map((slot, idx) => (idx === slotIndex ? null : slot))
+          : team
+      );
       return { teams: newTeams };
     }),
   moveNikkeWithinTeam: (teamIndex, fromIndex, toIndex) =>
@@ -61,4 +74,10 @@ export const useTeamStore = create<TeamState>((set) => ({
       newTeams[toTeamIndex][toSlotIndex] = movedNikke;
       return { teams: newTeams };
     }),
+  isNikkeUsed: (nikkeId: string) => {
+    const state = get();
+    return state.teams.some((team) =>
+      team.some((nikke) => nikke && nikke.id === nikkeId)
+    );
+  },
 }));

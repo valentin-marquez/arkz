@@ -53,7 +53,10 @@ async function getStorySites(): Promise<MetadataRoute.Sitemap> {
 async function getInterceptionSites(): Promise<MetadataRoute.Sitemap> {
   const supabase = createClient();
 
-  const { data, error } = await supabase.from("bosses").select("slug");
+  const { data, error } = await supabase
+    .from("bosses")
+    .select("slug")
+    .eq("mode_type", "Interception");
 
   if (error) {
     console.error(error);
@@ -67,10 +70,32 @@ async function getInterceptionSites(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 }
+
+async function getSoloRaidSites(): Promise<MetadataRoute.Sitemap> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("solo_raid_seasons")
+    .select("slug");
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data.map(({ slug }) => ({
+    url: getURL(`/solo-raid/${slug}`),
+    lastModified: new Date(),
+    changeFrequency: "daily",
+    priority: 0.8,
+  }));
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const manufacturerSites = await getManufacturerSites();
   const storySites = await getStorySites();
   const interceptionSites = await getInterceptionSites();
+  const soloRaidSites = await getSoloRaidSites();
 
   const additionalSites: MetadataRoute.Sitemap = [
     {
@@ -91,6 +116,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.9,
     },
+    {
+      url: getURL("/solo-raid"),
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
   ];
 
   return [
@@ -98,5 +129,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...manufacturerSites,
     ...storySites,
     ...interceptionSites,
+    ...soloRaidSites,
   ];
 }

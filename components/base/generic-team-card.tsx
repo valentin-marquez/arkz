@@ -1,7 +1,6 @@
-"use client";
 import React, { useState, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ThumbsUp, MessageCircle, Share2 } from "lucide-react";
+import { ThumbsUp, MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { m as motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +22,7 @@ import TeamShortUrlGenerator from "@/components/team-short-url-generator";
 import { Tables } from "@/lib/types/database.types";
 import { useAuth } from "@/providers/auth-provider";
 import { getMediaURL } from "@/lib/supabase/utils";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 
 export interface TeamCardProps {
   id: string;
@@ -39,9 +39,10 @@ export interface TeamCardProps {
   ) => React.ReactNode;
   mode: string;
   isLiked: boolean;
+  renderExtraContent?: () => React.ReactNode;
 }
 
-export default function GenericTeamcard({
+export default function GenericTeamCard({
   id,
   user,
   members,
@@ -51,12 +52,14 @@ export default function GenericTeamcard({
   renderMetadata,
   mode,
   isLiked: initialIsLiked,
+  renderExtraContent,
 }: TeamCardProps) {
   const { user: currentUser } = useAuth();
   const supabase = createClient();
   const [localIsLiked, setLocalIsLiked] = useState(initialIsLiked);
   const [localTotalVotes, setLocalTotalVotes] = useState(initialTotalVotes);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showAllMembers, setShowAllMembers] = useState(false);
 
   useEffect(() => {
     const channel = supabase
@@ -113,7 +116,6 @@ export default function GenericTeamcard({
           .match({ user_id: currentUser.id, team_id: id });
       }
     } catch (error) {
-      // Revert local state if the API call fails
       setLocalIsLiked(!newIsLiked);
       setLocalTotalVotes((prev) =>
         Math.max(0, newIsLiked ? prev - 1 : prev + 1)
@@ -123,6 +125,51 @@ export default function GenericTeamcard({
       setIsUpdating(false);
     }
   };
+
+  const renderNikkes = () => {
+    const sortedMembers = members.sort((a, b) => a.position - b.position);
+    const displayedMembers = showAllMembers
+      ? sortedMembers
+      : sortedMembers.slice(0, 5);
+
+    return (
+      <motion.div
+        className="grid grid-cols-5 gap-2 mb-2"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          visible: {
+            transition: {
+              staggerChildren: 0.05,
+            },
+          },
+        }}
+      >
+        {displayedMembers.map((member) => (
+          <motion.div
+            key={member.nikke_id}
+            className="flex flex-col items-center"
+            variants={{
+              hidden: { opacity: 0, scale: 0.8 },
+              visible: { opacity: 1, scale: 1 },
+            }}
+          >
+            <Avatar className="w-12 h-12 border-2 border-primary">
+              <AvatarImage
+                src={getMediaURL(member.icon_url)}
+                alt={member.name}
+              />
+              <AvatarFallback>{member.name[0]}</AvatarFallback>
+            </Avatar>
+            <span className="text-xs mt-1 w-full text-center truncate">
+              {member.name}
+            </span>
+          </motion.div>
+        ))}
+      </motion.div>
+    );
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -142,43 +189,28 @@ export default function GenericTeamcard({
         </CardHeader>
 
         <CardContent className="p-4 pt-2">
-          <motion.div
-            className="flex flex-wrap gap-2 mb-2"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              visible: {
-                transition: {
-                  staggerChildren: 0.05,
-                },
-              },
-            }}
-          >
-            {members
-              .sort((a, b) => a.position - b.position)
-              .map((member) => (
-                <motion.div
-                  key={member.nikke_id}
-                  className="flex flex-col items-center"
-                  variants={{
-                    hidden: { opacity: 0, scale: 0.8 },
-                    visible: { opacity: 1, scale: 1 },
-                  }}
-                >
-                  <Avatar className="w-12 h-12 border-2 border-primary">
-                    <AvatarImage
-                      src={getMediaURL(member.icon_url)}
-                      alt={member.name}
-                    />
-                    <AvatarFallback>{member.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <span className="text-xs mt-1 w-12 text-center line-clamp-1">
-                    {member.name}
-                  </span>
-                </motion.div>
-              ))}
-          </motion.div>
-          <div className="flex items-center justify-between mt-2">
+          {renderNikkes()}
+          {members.length > 5 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowAllMembers(!showAllMembers)}
+              className="w-full mt-2"
+            >
+              {showAllMembers ? (
+                <>
+                  <ChevronUp className="mr-2 h-4 w-4" />
+                  Show Less
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="mr-2 h-4 w-4" />
+                  Show All Nikkes
+                </>
+              )}
+            </Button>
+          )}
+          <div className="flex items-center justify-between mt-4">
             {renderMetadata(metadata)}
             <AnimatePresence>
               <motion.span
@@ -193,6 +225,13 @@ export default function GenericTeamcard({
             </AnimatePresence>
           </div>
         </CardContent>
+
+        {renderExtraContent && (
+          <>
+            <Separator />
+            <CardContent>{renderExtraContent()}</CardContent>
+          </>
+        )}
 
         <Separator />
         <CardFooter className="p-2 flex justify-around">
@@ -230,8 +269,8 @@ export default function GenericTeamcard({
               <DialogHeader>
                 <DialogTitle>Team Comment</DialogTitle>
               </DialogHeader>
-              <div className="mt-2">
-                <p className="text-sm text-muted-foreground">{comment}</p>
+              <div className="mt-2 max-h-[60vh] overflow-y-auto">
+                <MarkdownRenderer content={comment || ""} />
               </div>
             </DialogContent>
           </Dialog>

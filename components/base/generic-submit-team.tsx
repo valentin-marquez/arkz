@@ -4,27 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { m as motion } from "framer-motion";
 import { useCharacterStore } from "@/lib/store/character-store";
 import { useTeamStore } from "@/lib/store/team-store";
-import { createClient } from "@/lib/supabase/client";
 import { getMediaURL } from "@/lib/supabase/utils";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { Tables } from "@/lib/types/database.types";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 
 interface GenericSubmitTeamProps<T> {
   numberOfTeams: number;
   versions: Tables<"game_versions">[];
-  allowCharacterRepeat: boolean;
-  characters: Tables<"nikkes">[];
   renderCharacterCard: (
     character: Tables<"nikkes">,
     onClick: () => void
   ) => React.ReactNode;
-  getCharacterId: (character: Tables<"nikkes">) => string;
   onSubmit: (
     teams: Tables<"nikkes">[][],
     comment: string,
@@ -35,64 +32,37 @@ interface GenericSubmitTeamProps<T> {
 
 const MotionButton = motion(Button);
 
+const TEAM_SIZE = 5;
+
 export default function GenericSubmitTeam<T>({
   numberOfTeams,
   versions,
-  allowCharacterRepeat,
   renderCharacterCard,
   onSubmit,
   onClose,
 }: GenericSubmitTeamProps<T>) {
-  const supabase = createClient();
   const { characters, setCharacters, filteredCharacters, setFilter } =
     useCharacterStore();
-  const { teams, setTeams, addNikkeToTeam, removeNikkeFromTeam } =
+  const { teams, setTeams, addNikkeToTeam, removeNikkeFromTeam, isNikkeUsed } =
     useTeamStore();
   const [activeTeam, setActiveTeam] = useState(0);
   const [comment, setComment] = useState("");
-  const [usedCharacters, setUsedCharacters] = useState(new Set());
   const [selectedVersion, setSelectedVersion] = useState(versions[0].id);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isPreviewVisible, setIsPreviewVisible] = useState(false);
 
   useEffect(() => {
-    const fetchCharacters = async () => {
-      const { data, error } = await supabase.from("nikkes").select("*");
-      if (error) {
-        console.error("Error fetching characters:", error);
-      } else {
-        setCharacters(data as Tables<"nikkes">[]);
-      }
-    };
-
-    fetchCharacters();
-  }, [setCharacters, supabase]);
-
-  useEffect(() => {
-    setTeams(
-      Array(numberOfTeams)
-        .fill(null)
-        .map(() => Array(5).fill(null))
-    );
-  }, [numberOfTeams, setTeams]);
-
-  useEffect(() => {
-    const used = new Set();
-    teams.forEach((team) => {
-      team.forEach((nikke) => {
-        if (nikke) used.add(nikke.id);
-      });
-    });
-    setUsedCharacters(used);
-  }, [teams]);
+    setTeams(Array(numberOfTeams).fill(Array(TEAM_SIZE).fill(null)));
+  }, [setTeams, numberOfTeams]);
 
   useEffect(() => {
     setFilter(searchTerm);
   }, [searchTerm, setFilter]);
 
-  const handleAddToTeam = (character: (typeof characters)[0]) => {
+  const handleAddToTeam = (character: Tables<"nikkes">) => {
     const emptySlotIndex = teams[activeTeam].findIndex((slot) => slot === null);
-    if (emptySlotIndex !== -1) {
+    if (emptySlotIndex !== -1 && !isNikkeUsed(character.id)) {
       addNikkeToTeam(character, activeTeam, emptySlotIndex);
     }
   };
@@ -111,6 +81,10 @@ export default function GenericSubmitTeam<T>({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const togglePreview = () => {
+    setIsPreviewVisible(!isPreviewVisible);
   };
 
   return (
@@ -179,15 +153,40 @@ export default function GenericSubmitTeam<T>({
               ))}
             </div>
             <div className="mt-4">
-              <Textarea
-                placeholder="Add a comment about your team(s) (Markdown supported)"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                className="w-full h-24 mb-4"
-              />
+              <div className="relative">
+                <Textarea
+                  placeholder="Add a comment about your team(s) (Markdown supported)"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  className="w-full h-24 mb-2"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  onClick={togglePreview}
+                >
+                  {isPreviewVisible ? (
+                    <>
+                      <EyeOff className="w-4 h-4 mr-2" />
+                      Hide Preview
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="w-4 h-4 mr-2" />
+                      Preview
+                    </>
+                  )}
+                </Button>
+              </div>
+              {isPreviewVisible && (
+                <div className="mt-2 p-4 border rounded-md bg-muted">
+                  <MarkdownRenderer content={comment} />
+                </div>
+              )}
               <MotionButton
                 onClick={handleSubmit}
-                className="w-full"
+                className="w-full mt-4"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", bounce: 0.05, duration: 0.25 }}
@@ -223,13 +222,13 @@ export default function GenericSubmitTeam<T>({
             <ScrollArea className="flex-grow h-80 lg:h-[480px] px-1.5">
               <motion.div
                 layout
-                className="grid grid-cols-2 sm:grid-cols-4  gap-2 p-2"
+                className="grid grid-cols-1   md:grid-cols-3 sm:grid-cols-2 gap-2 p-2"
               >
                 {filteredCharacters.map((character) => (
                   <motion.div
                     key={character.id}
                     className={
-                      usedCharacters.has(character.id) && !allowCharacterRepeat
+                      isNikkeUsed(character.id)
                         ? "opacity-50 pointer-events-none"
                         : "cursor-pointer"
                     }

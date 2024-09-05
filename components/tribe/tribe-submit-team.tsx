@@ -145,12 +145,9 @@ export default function TribeTowerSubmitTeam({
     <GenericSubmitTeam
       numberOfTeams={1}
       versions={versions}
-      allowCharacterRepeat={allowCharacterRepeat}
-      characters={filteredCharacters}
       renderCharacterCard={(character, onClick) => (
         <CharacterCard {...character} isLink={false} />
       )}
-      getCharacterId={(character) => character.id}
       onSubmit={handleSubmit}
       onClose={onClose}
     />

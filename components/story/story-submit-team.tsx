@@ -131,12 +131,9 @@ export default function StorySubmitTeam({
     <GenericSubmitTeam
       numberOfTeams={numberOfTeams}
       versions={versions}
-      allowCharacterRepeat={allowCharacterRepeat}
-      characters={characters}
       renderCharacterCard={(character, onClick) => (
         <CharacterCard {...character} isLink={false} />
       )}
-      getCharacterId={(character) => character.id}
       onSubmit={handleSubmit}
       onClose={onClose}
     />
