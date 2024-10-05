@@ -53,17 +53,14 @@ function isTowerAvailable(tower: Tables<"tribe_towers">): boolean {
     "Saturday",
   ];
 
-  // Saturday (UTC) is always available
   if (utcDay === 6) return true;
 
-  // Check if the tower is available today
   if (tower.available_days.includes(daysOfWeek[utcDay])) {
     if (now >= resetDate) {
       return true;
     }
   }
 
-  // Check if the tower was available yesterday and it's before today's reset
   const yesterdayIndex = (utcDay - 1 + 7) % 7;
   if (tower.available_days.includes(daysOfWeek[yesterdayIndex])) {
     if (now < resetDate) {

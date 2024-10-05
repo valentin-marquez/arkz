@@ -155,7 +155,7 @@ export default function GenericSubmitTeam<T>({
             <div className="mt-4">
               <div className="relative">
                 <Textarea
-                  placeholder="Add a comment about your team(s) (Markdown supported)"
+                  placeholder="Add a comment about your team(s)"
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   className="w-full h-24 mb-2"

@@ -5,7 +5,6 @@ import { signInWithDiscord } from "@/app/actions/auth";
 import { usePathname } from "next/navigation";
 import GenericSubmitTeamModal from "@/components/base/generic-submit-team-modal";
 import TribeTowerSubmitTeam from "./tribe-submit-team";
-// import { Database, GameVersion } from "@/lib/types/database.types";
 import { Tables } from "@/lib/types/database.types";
 
 interface TribeTowerSubmitTeamModalProps {

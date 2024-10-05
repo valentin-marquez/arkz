@@ -1,4 +1,3 @@
-// app/actions/solo-raid-teams.ts
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
@@ -25,8 +24,18 @@ export async function submitSoloRaidTeam(data: SoloRaidTeamSubmission) {
 
   const { seasonId, comment, gameVersionId, teams } = data;
 
+  if (
+    teams.length === 0 ||
+    teams.some((team) => team.length === 0 || team.some((nikke) => !nikke))
+  ) {
+    return {
+      success: false,
+      error:
+        "All teams must have at least one Nikke and no Nikke can be null or undefined",
+    };
+  }
+
   try {
-    // Start a Supabase transaction
     const { data: teamData, error: teamError } = await supabase
       .from("solo_raid_teams")
       .insert({
@@ -55,7 +64,6 @@ export async function submitSoloRaidTeam(data: SoloRaidTeamSubmission) {
 
     if (nikkesError) throw nikkesError;
 
-    // Revalidate the page to update the UI
     revalidatePath("/solo-raid");
 
     return { success: true, teamId: teamData.id };

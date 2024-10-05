@@ -23,7 +23,6 @@ async function fetchBossData(slug: string): Promise<{
 }> {
   const supabase = createClient();
 
-  // Fetch the boss data
   const { data: boss, error: bossError } = await supabase
     .from("bosses")
     .select("*")
@@ -32,7 +31,6 @@ async function fetchBossData(slug: string): Promise<{
 
   if (bossError) throw bossError;
 
-  // Fetch the teams and associated Nikke details
   const { data: teams, error: teamsError } = await supabase
     .from("interception_teams_with_votes_and_boss")
     .select("*")

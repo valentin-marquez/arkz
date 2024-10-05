@@ -1,11 +1,9 @@
-// app/actions/vote.ts
 "use server";
 import { createClient } from "@/lib/supabase/server";
 
 export async function voteForTeam(teamId: string, voteType: "up" | "down") {
   const supabase = createClient();
 
-  // Get the current user
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -14,7 +12,6 @@ export async function voteForTeam(teamId: string, voteType: "up" | "down") {
     throw new Error("User must be logged in to vote");
   }
 
-  // Check if the user has already voted for this team
   const { data: existingVote, error: checkError } = await supabase
     .from("votes")
     .select("id, vote")
@@ -29,7 +26,6 @@ export async function voteForTeam(teamId: string, voteType: "up" | "down") {
   const voteValue = voteType === "up" ? 1 : -1;
 
   if (existingVote) {
-    // Update existing vote
     const { error: updateError } = await supabase
       .from("votes")
       .update({ vote: voteValue })
@@ -37,7 +33,6 @@ export async function voteForTeam(teamId: string, voteType: "up" | "down") {
 
     if (updateError) throw updateError;
   } else {
-    // Insert new vote
     const { error: insertError } = await supabase
       .from("votes")
       .insert({ user_id: session.user.id, team_id: teamId, vote: voteValue });
@@ -45,7 +40,6 @@ export async function voteForTeam(teamId: string, voteType: "up" | "down") {
     if (insertError) throw insertError;
   }
 
-  // Return the new total votes for the team
   const { data: newTotalVotes, error: countError } = await supabase
     .from("teams_with_chapter_votes")
     .select("total_votes")

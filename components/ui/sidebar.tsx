@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import { m as motion, AnimatePresence, MotionConfig } from "framer-motion";
 import Link from "next/link";
@@ -53,11 +53,11 @@ const sidebarOptions: SidebarOption[] = [
   { icon: Castle, label: "Tribe Tower", href: "/tribe" },
   { icon: Target, label: "Interception", href: "/interception" },
   { icon: Swords, label: "Solo Raid", href: "/solo-raid" },
-  // { icon: Users, label: "Special Arena", href: "/special-arena" },
   { icon: Settings, label: "Settings", href: "/settings", separator: true },
   { icon: HelpCircle, label: "Support", href: "/help" },
 ];
 
+// Move the sidebar variants and transitions outside of the component
 const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -72,29 +72,6 @@ const Sidebar: React.FC = () => {
   useEffect(() => {
     setIsDark(isDarkTheme(theme));
   }, [theme]);
-
-  const sidebarVariants = {
-    open: {
-      width: "15rem",
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 40,
-        bounce: 0.05,
-        duration: 0.2,
-      },
-    },
-    closed: {
-      width: "4rem",
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 40,
-        bounce: 0.05,
-        duration: 0.2,
-      },
-    },
-  };
 
   useEffect(() => {
     if (!isDesktop) {
@@ -124,16 +101,58 @@ const Sidebar: React.FC = () => {
 
   const isActive = (href: string) => pathname === href;
 
+  const buttonTransition = useMemo(
+    () => ({
+      type: "spring",
+      stiffness: 400,
+      damping: 40,
+      bounce: 0.05,
+      duration: 0.25,
+    }),
+    []
+  );
+
+  const overlayVariants = useMemo(
+    () => ({
+      open: { opacity: 1, display: "block" },
+      closed: { opacity: 0, transitionEnd: { display: "none" } },
+    }),
+    []
+  );
+
+  const sidebarVariants = useMemo(
+    () => ({
+      open: {
+        width: "15rem",
+        transition: {
+          type: "spring",
+          stiffness: 400,
+          damping: 40,
+          bounce: 0.05,
+          duration: 0.2,
+        },
+      },
+      closed: {
+        width: "4rem",
+        transition: {
+          type: "spring",
+          stiffness: 400,
+          damping: 40,
+          bounce: 0.05,
+          duration: 0.2,
+        },
+      },
+    }),
+    []
+  );
+
   return (
     <MotionConfig transition={{ type: "spring", bounce: 0.05, duration: 0.25 }}>
       <motion.div
         className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
         initial={false}
         animate={!isCollapsed ? "open" : "closed"}
-        variants={{
-          open: { opacity: 1, display: "block" },
-          closed: { opacity: 0, transitionEnd: { display: "none" } },
-        }}
+        variants={overlayVariants}
         transition={{ duration: 0.3 }}
         onClick={() => setIsCollapsed(true)}
       />
@@ -141,7 +160,7 @@ const Sidebar: React.FC = () => {
         initial={false}
         animate={isCollapsed ? "closed" : "open"}
         variants={sidebarVariants}
-        transition={{ type: "spring", bounce: 0.05, duration: 0.25 }}
+        transition={buttonTransition}
         style={{ zIndex: 1000 }}
         className={cn(
           "flex flex-col justify-between h-screen bg-background text-foreground border-r border-border py-2 sticky top-0"
@@ -167,7 +186,7 @@ const Sidebar: React.FC = () => {
                   initial={{ opacity: 0, x: -28 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -28 }}
-                  transition={{ type: "spring", bounce: 0.05, duration: 0.25 }}
+                  transition={buttonTransition}
                   style={isCollapsed ? { display: "none" } : {}}
                 >
                   Arkz
@@ -261,24 +280,12 @@ const Sidebar: React.FC = () => {
             open: { x: "13rem" },
             closed: { x: "2rem" },
           }}
-          transition={{
-            type: "spring",
-            stiffness: 400,
-            damping: 40,
-            bounce: 0.05,
-            duration: 0.25,
-          }}
+          transition={buttonTransition}
         >
           <motion.div
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            transition={{
-              type: "spring",
-              stiffness: 400,
-              damping: 17,
-              bounce: 0.05,
-              duration: 0.25,
-            }}
+            transition={buttonTransition}
           >
             <Button
               variant="ghost"
@@ -288,13 +295,7 @@ const Sidebar: React.FC = () => {
             >
               <motion.div
                 animate={{ rotate: isCollapsed ? 0 : 180 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 200,
-                  damping: 20,
-                  bounce: 0.05,
-                  duration: 0.25,
-                }}
+                transition={buttonTransition}
               >
                 <ChevronRight className="w-3 h-3" />
               </motion.div>

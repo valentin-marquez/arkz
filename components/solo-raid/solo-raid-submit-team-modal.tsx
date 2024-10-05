@@ -1,5 +1,3 @@
-// components/solo-raid/solo-raid-submit-team-modal.tsx
-
 "use client";
 import React, { useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
@@ -51,7 +49,6 @@ export default function SoloRaidSubmitTeamModal({
       isUserSignedIn={!!user}
       isOpen={isOpen}
       setIsOpen={setIsOpen}
-
     />
   );
 }

@@ -131,39 +131,6 @@ export const StoryPage: React.FC<StoryPageProps> = ({ initialChapters }) => {
             <TabsTrigger value="hard">Hard</TabsTrigger>
           </TabsList>
         </Tabs>
-
-        <div className="flex flex-col sm:flex-row gap-4 items-center">
-          <div className="flex-grow flex items-center gap-2 w-full sm:w-auto">
-            <Select value={sortBy} onValueChange={handleSortChange}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="chapter_number">Chapter Number</SelectItem>
-                <SelectItem value="title">Title</SelectItem>
-              </SelectContent>
-            </Select>
-            <Input
-              type="text"
-              placeholder="Search chapters..."
-              value={
-                difficulty === "normal" ? normalSearchTerm : hardSearchTerm
-              }
-              onChange={handleSearchChange}
-              className="flex-grow"
-            />
-            <Button variant="outline" onClick={handleSortOrderChange}>
-              <motion.div
-                initial={{ opacity: 0, rotate: -90 }}
-                animate={{ opacity: 1, rotate: 0 }}
-                exit={{ opacity: 0, rotate: 90 }}
-                transition={{ duration: 0.2 }}
-              >
-                {sortOrder === "asc" ? <ChevronUp /> : <ChevronDown />}
-              </motion.div>
-            </Button>
-          </div>
-        </div>
       </div>
 
       <AnimatePresence>

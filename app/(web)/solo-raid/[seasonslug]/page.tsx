@@ -111,7 +111,6 @@ export default async function SoloRaidSeasonPage({
   const { season, teams, versions, userLikes } = await fetchSeasonData(
     params.seasonslug
   );
-  console.log(teams);
 
   if (!season) {
     return <div>Season not found.</div>;

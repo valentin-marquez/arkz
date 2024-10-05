@@ -58,8 +58,6 @@ export type TeamWithNikkes =
   | TeamWithNikkesInterception
   | TeamWithNikkesSoloRaid;
 
-// seaosn info with boss info
-
 export type SeasonWithBoss = Tables<"solo_raid_seasons"> & {
   boss: Tables<"bosses">;
 };

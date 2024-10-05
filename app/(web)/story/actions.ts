@@ -34,7 +34,6 @@ export async function submitStoryTeam(
   const supabase = createClient();
 
   try {
-    // Validate the submission data
     StoryTeamSubmissionSchema.parse(submission);
 
     const {
@@ -76,7 +75,6 @@ export async function submitStoryTeam(
       };
     }
 
-    // Revalidate the chapter page and the team list page
     revalidatePath(`/story/chapter/${submission.chapterId}`);
     revalidatePath("/story/teams");
 

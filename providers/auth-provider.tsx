@@ -1,11 +1,18 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { useToast } from "@/components/ui/use-toast";
-import { setCookie, getCookie, deleteCookie } from "cookies-next";
+import { deleteCookie, getCookie, setCookie } from "cookies-next";
+import { useRouter } from "next/navigation";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 type AuthContextType = {
   user: User | null;
@@ -89,15 +96,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initializeAuth();
   }, [router, supabase, toast]);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     setIsLoading(true);
     await supabase.auth.signOut();
     setUser(null);
     handleDeleteCookie("welcomeShown");
     setIsLoading(false);
-  };
+  }, [supabase]);
 
-  const signIn = async () => {
+  const signIn = useCallback(async () => {
     setIsLoading(true);
     await supabase.auth.signInWithOAuth({
       provider: "discord",
@@ -105,12 +112,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
-  };
+  }, [supabase]);
+
+  const contextValue = useMemo(
+    () => ({
+      user,
+      isLoading,
+      signOut,
+      signIn,
+    }),
+    [user, isLoading, signOut, signIn]
+  );
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, signOut, signIn }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 

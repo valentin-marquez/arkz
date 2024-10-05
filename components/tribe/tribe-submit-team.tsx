@@ -25,7 +25,6 @@ interface TribeTowerSubmitTeamProps {
   manufacturer: string;
 }
 
-// Helper function to convert string to Manufacturer type
 const stringToManufacturer = (value: string): Manufacturer | undefined => {
   const manufacturers: Manufacturer[] = [
     "Pilgrim",

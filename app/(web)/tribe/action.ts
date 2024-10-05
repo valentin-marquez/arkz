@@ -18,7 +18,6 @@ export async function submitTribeTowerTeam(
   const supabase = createClient();
 
   try {
-    // Validate the submission data
     TribeTowerTeamSubmissionSchema.parse(submission);
 
     const {
@@ -32,7 +31,6 @@ export async function submitTribeTowerTeam(
       };
     }
 
-    // Fetch the tower data to check the max floors
     const { data: towerData, error: towerError } = await supabase
       .from("tribe_towers")
       .select("max_floors, manufacturer")
@@ -111,7 +109,6 @@ export async function submitTribeTowerTeam(
       };
     }
 
-    // Revalidate the tower page and the team list page
     revalidatePath(`/tribe/tower/${submission.towerId}`);
     revalidatePath("/tribe/teams");
 

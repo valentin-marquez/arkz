@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { toast } from "sonner";
+import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/providers/auth-provider";
 import GenericSubmitTeam from "@/components/base/generic-submit-team";
 import { Tables } from "@/lib/types/database.types";
@@ -21,6 +21,7 @@ export default function SoloRaidSubmitTeam({
   onClose,
 }: SoloRaidSubmitTeamProps) {
   const { user } = useAuth();
+  const { toast } = useToast();
 
   const handleSubmit = async (
     teams: Tables<"nikkes">[][],
@@ -28,11 +29,20 @@ export default function SoloRaidSubmitTeam({
     version: string
   ) => {
     if (!user) {
-      toast.error("You must be logged in to submit a team");
+      toast({
+        title: "You must be logged in to submit a team",
+        description: "Please log in to submit a team.",
+      });
       return;
     }
 
-    console.log("Submitting team", teams, comment, version);
+    if (teams.length === 0 || teams.some((team) => team.length === 0)) {
+      toast({
+        title: "All teams must have at least one Nikke",
+        description: "Please add at least one Nikke to each team.",
+      });
+      return;
+    }
 
     try {
       const result = await submitSoloRaidTeam({
@@ -43,14 +53,25 @@ export default function SoloRaidSubmitTeam({
       });
 
       if (result.success) {
-        toast.success("Team submitted successfully!");
+        toast({
+          title: "Team submitted successfully!",
+          description: "Your team has been submitted successfully.",
+        });
         onClose();
       } else {
-        throw new Error(result.error);
+        toast({
+          title: "Failed to submit team",
+          description: result.error,
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error submitting team:", error);
-      toast.error("Failed to submit team. Please try again.");
+      toast({
+        title: "Failed to submit team",
+        description: "Please try again.",
+        variant: "destructive",
+      });
     }
   };
 

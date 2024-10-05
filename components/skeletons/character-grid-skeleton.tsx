@@ -4,7 +4,6 @@ import React from "react";
 import CharacterCardSkeleton from "./character-card-skeleton";
 
 const CharacterGridSkeleton: React.FC = () => {
-  // Adjust this number to match the number of skeleton cards you want to display
   const skeletonCount = 12;
 
   return (

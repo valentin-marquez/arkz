@@ -154,6 +154,7 @@ export default function CharacterContainer({
                     width={16}
                     height={16}
                     className="inline-block mr-1 active:invert"
+                    loading="lazy"
                   />
                   <span className="hidden sm:inline">{element}</span>
                 </FilterButton>

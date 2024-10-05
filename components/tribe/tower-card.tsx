@@ -100,7 +100,6 @@ const TowerCard: React.FC<TowerCardProps> = ({
                 title={`Tribe Tower - ${manufacturer} logo`}
                 className={`rounded-full
                   ${
-                    // estos son los estilos dark mode
                     theme === "default" ||
                     theme === "dark-dorothy" ||
                     theme === "dark-red-hood"

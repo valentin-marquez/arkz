@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
-import TeamShortUrlGenerator from "@/components/team-short-url-generator";
 import { Tables } from "@/lib/types/database.types";
 import { useAuth } from "@/providers/auth-provider";
 import { getMediaURL } from "@/lib/supabase/utils";
@@ -185,7 +184,6 @@ export default function GenericTeamCard({
             </Avatar>
             <span className="font-medium text-sm">{user.username}</span>
           </div>
-          <TeamShortUrlGenerator teamId={id} mode={mode} />
         </CardHeader>
 
         <CardContent className="p-4 pt-2">

@@ -40,7 +40,6 @@ export async function submitInterceptionTeam(
   const supabase = createClient();
 
   try {
-    // Validate the submission data
     InterceptionTeamSubmissionSchema.parse(submission);
 
     const {
@@ -82,7 +81,6 @@ export async function submitInterceptionTeam(
       };
     }
 
-    // Revalidate the boss page and the team list page
     revalidatePath(`/interception/boss/${submission.bossId}`);
     revalidatePath("/interception/teams");
 
