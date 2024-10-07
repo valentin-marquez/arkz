@@ -1,19 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import InterceptionTeamList from "@/components/interception/interception-team-list";
-import InterceptionSubmitTeamModal from "@/components/interception/interception-submit-team-modal";
+import { Header } from "@/components/ui/header";
+import AnomalyInterceptionTeamList from "@/components/anomaly-interception/anomaly-interception-team-list";
+import AnomalyInterceptionSubmitTeamModal from "@/components/anomaly-interception/anomaly-interception-submit-team-modal";
 import { Tables } from "@/lib/types/database.types";
 import { Metadata } from "next";
-import { Header } from "@/components/ui/header";
 
 async function fetchBossData(slug: string): Promise<{
   boss: Tables<"bosses"> | null;
@@ -27,12 +18,13 @@ async function fetchBossData(slug: string): Promise<{
     .from("bosses")
     .select("*")
     .eq("slug", slug)
+    .eq("mode_type", "Anomaly Interception")
     .single();
 
   if (bossError) throw bossError;
 
   const { data: teams, error: teamsError } = await supabase
-    .from("interception_teams_with_votes_and_boss")
+    .from("anomaly_interception_teams_with_votes_and_boss")
     .select("*")
     .eq("slug", slug);
 
@@ -43,7 +35,7 @@ async function fetchBossData(slug: string): Promise<{
       if (!team.team_id) return team;
 
       const { data: nikkes, error: nikkesError } = await supabase
-        .from("interception_team_nikke_details")
+        .from("anomaly_interception_team_nikke_details")
         .select("*")
         .eq("team_id", team.team_id);
 
@@ -94,17 +86,17 @@ export async function generateMetadata({
 
   return {
     title: `${
-      boss?.name || "Interception Boss"
+      boss?.name || "Anomaly Interception Boss"
     } Guide - Arkz | Nikke: Goddess of Victory`,
     description: `Defeat ${
       boss?.name || "this boss"
-    } in the Interception mode of Nikke: Goddess of Victory. Learn the best strategies, team compositions, and tips to conquer ${
+    } in the Anomaly Interception mode of Nikke: Goddess of Victory. Learn the best strategies, team compositions, and tips to conquer ${
       boss?.name || "this challenging boss"
     }.`,
   };
 }
 
-export default async function InterceptionBossPage({
+export default async function AnomalyInterceptionBossPage({
   params,
 }: {
   params: { slug: string };
@@ -118,7 +110,7 @@ export default async function InterceptionBossPage({
 
   const breadcrumbs = [
     { href: "/", label: "Home" },
-    { href: "/interception", label: "Interception" },
+    { href: "/anomaly-interception", label: "Anomaly Interception" },
     { label: boss.name },
   ];
 
@@ -128,20 +120,20 @@ export default async function InterceptionBossPage({
       <Header
         breadcrumbs={breadcrumbs}
         title={boss.name}
-        subtitle="Interception Boss"
+        subtitle="Anomaly Interception Boss"
       />
       <Card className="container mx-auto w-full p-0">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle>Teams</CardTitle>
-          <InterceptionSubmitTeamModal
+          <AnomalyInterceptionSubmitTeamModal
             modeId={boss.mode_id || ""}
-            modeName="Interception"
+            modeName="Anomaly Interception"
             boss={boss}
             versions={versions}
           />
         </CardHeader>
         <CardContent className="p-4 pt-0 xl:p-6">
-          <InterceptionTeamList
+          <AnomalyInterceptionTeamList
             initialTeams={teams}
             versions={versions}
             boss={boss}

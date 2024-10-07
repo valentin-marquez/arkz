@@ -128,6 +128,48 @@ export type InterceptionTeamSubmission = z.infer<
   typeof InterceptionTeamSubmissionSchema
 >;
 
+export const AnomalyInterceptionTeamSubmissionSchema = z.object({
+  userId: z
+    .string()
+    .uuid(
+      "User ID's more elusive than a Tetra in a sandstorm! Got a real one?"
+    ),
+  modeId: z
+    .string()
+    .uuid("Mode ID's more scrambled than a Pilgrim's tech! Find a proper one!"),
+  bossId: z
+    .string()
+    .uuid("Boss ID's more elusive than a Rapture's aim! Find a real one!"),
+  gameVersionId: z
+    .string()
+    .uuid(
+      "Game version's more outdated than a Missilis' fashion sense! Update it!"
+    ),
+  comment: z.string().optional(),
+  nikkes: z
+    .array(
+      z.object({
+        id: z
+          .string()
+          .uuid(
+            "This Nikke ID's more scrambled than a Pilgrim's tech! Find a proper one!"
+          ),
+        position: z
+          .number()
+          .int()
+          .min(1, "Positions start at 1! Even a rookie knows that!"),
+      })
+    )
+    .length(
+      5,
+      "Five Nikkes or bust! It's not rocket science... well, maybe it is for some Nikkes."
+    ),
+});
+
+export type AnomalyInterceptionTeamSubmission = z.infer<
+  typeof AnomalyInterceptionTeamSubmissionSchema
+>;
+
 export const nikkeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   slug: z.string().min(1, "Slug is required"),

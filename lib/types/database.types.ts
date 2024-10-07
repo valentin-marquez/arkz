@@ -47,6 +47,11 @@ export type TeamWithNikkesInterception =
     nikkes: Tables<"interception_team_nikke_details">[];
   };
 
+export type TeamWithNikkesAnomalyInterception =
+  Tables<"anomaly_interception_teams_with_votes_and_boss"> & {
+    nikkes: Tables<"anomaly_interception_team_nikke_details">[];
+  };
+
 export type TeamWithNikkesSoloRaid =
   Tables<"solo_raid_teams_with_votes_and_season"> & {
     nikkes: Tables<"solo_raid_team_nikke_details">[];
@@ -56,6 +61,7 @@ export type TeamWithNikkes =
   | TeamWithNikkesStory
   | TeamWithNIkkesTribe
   | TeamWithNikkesInterception
+  | TeamWithNikkesAnomalyInterception
   | TeamWithNikkesSoloRaid;
 
 export type SeasonWithBoss = Tables<"solo_raid_seasons"> & {

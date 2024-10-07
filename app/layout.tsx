@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
-import { Red_Hat_Display as FontSans } from "next/font/google";
-import "@/styles/globals.css";
-import { cn, getURL } from "@/lib/utils";
-import { PropsWithChildren } from "react";
-import { ThemeProvider } from "@/providers/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
 import Sidebar from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/toaster";
+import { cn, getURL } from "@/lib/utils";
 import { AuthProvider } from "@/providers/auth-provider";
-import CloudflareWebAnalyticsProvider from "next-cloudflare-web-analytics";
 import FramerProvider from "@/providers/framer-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
+import "@/styles/globals.css";
+import type { Metadata } from "next";
+import CloudflareWebAnalyticsProvider from "next-cloudflare-web-analytics";
+import { Red_Hat_Display as FontSans } from "next/font/google";
+import { PropsWithChildren } from "react";
 
 const fontSans = FontSans({
   subsets: ["latin"],

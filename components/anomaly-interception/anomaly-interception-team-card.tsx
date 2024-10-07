@@ -5,15 +5,14 @@ import GenericTeamCard, {
 } from "@/components/base/generic-team-card";
 import { Badge } from "@/components/ui/badge";
 
-interface InterceptionTeamCardProps
+interface AnomalyInterceptionTeamCardProps
   extends Omit<TeamCardProps, "renderMetadata"> {
   bossName: string;
 }
 
-const InterceptionTeamCard: React.FC<InterceptionTeamCardProps> = ({
-  bossName,
-  ...props
-}) => {
+const AnomalyInterceptionTeamCard: React.FC<
+  AnomalyInterceptionTeamCardProps
+> = ({ bossName, ...props }) => {
   const renderMetadata = (metadata: Record<string, string | number>) => (
     <div className="flex space-x-2">
       <Badge variant="secondary">{bossName}</Badge>
@@ -23,4 +22,4 @@ const InterceptionTeamCard: React.FC<InterceptionTeamCardProps> = ({
   return <GenericTeamCard {...props} renderMetadata={renderMetadata} />;
 };
 
-export default InterceptionTeamCard;
+export default AnomalyInterceptionTeamCard;

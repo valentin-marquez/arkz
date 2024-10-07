@@ -31,6 +31,7 @@ import {
   LogOut,
   Menu,
   Loader,
+  Skull,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
@@ -53,6 +54,11 @@ const sidebarOptions: SidebarOption[] = [
   { icon: Castle, label: "Tribe Tower", href: "/tribe" },
   { icon: Target, label: "Interception", href: "/interception" },
   { icon: Swords, label: "Solo Raid", href: "/solo-raid" },
+  {
+    icon: Skull,
+    label: "Anomaly interception",
+    href: "/anomaly-interception",
+  },
   { icon: Settings, label: "Settings", href: "/settings", separator: true },
   { icon: HelpCircle, label: "Support", href: "/help" },
 ];
