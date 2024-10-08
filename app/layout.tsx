@@ -108,27 +108,29 @@ export default function RootLayout({
               fontSans.variable
             )}
           >
-            <ThemeProvider
-              defaultTheme="default"
-              enableColorScheme
-              disableTransitionOnChange
-              themes={[
-                "default",
-                "dorothy",
-                "dark-dorothy",
-                "red-hood",
-                "dark-red-hood",
-              ]}
-              enableSystem={false}
-            >
-              <div className="flex w-full">
-                <div className="w-16 flex-shrink-0 sticky z-50">
-                  <Sidebar />
+            <div className="flex min-h-screen w-full flex-col bg-muted/40">
+              <ThemeProvider
+                defaultTheme="default"
+                enableColorScheme
+                disableTransitionOnChange
+                themes={[
+                  "default",
+                  "dorothy",
+                  "dark-dorothy",
+                  "red-hood",
+                  "dark-red-hood",
+                ]}
+                enableSystem={false}
+              >
+                <div className="flex w-full">
+                  <div className="w-16 flex-shrink-0 sticky z-50">
+                    <Sidebar />
+                  </div>
+                  <main className="flex-1 p-4 overflow-auto">{children}</main>
                 </div>
-                <main className="flex-1 p-4 overflow-auto">{children}</main>
-              </div>
-              <Toaster />
-            </ThemeProvider>
+                <Toaster />
+              </ThemeProvider>
+            </div>
           </body>
         </FramerProvider>
       </AuthProvider>

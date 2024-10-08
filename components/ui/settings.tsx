@@ -1,32 +1,29 @@
 "use client";
 
 import {
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import {
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
 import { m as motion } from "framer-motion";
+import { useTheme } from "next-themes";
 
 const SettingsDialog = () => {
   const { theme, setTheme } = useTheme();
 
   const themeMapping: Record<string, string> = {
     default: "Dark (Default)",
-    dorothy: "Dorothy",
-    "dark-dorothy": "Dorothy (Dark)",
-    "red-hood": "Red Hood",
-    "dark-red-hood": "Red Hood (Dark)",
+    "dark-dorothy": "Dorothy",
+    "dark-red-hood": "Red Hood",
   };
 
   return (

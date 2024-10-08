@@ -1,45 +1,37 @@
 "use client";
-import React, { useEffect, useState, useMemo } from "react";
-import Image from "next/image";
-import { m as motion, AnimatePresence, MotionConfig } from "framer-motion";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
-import useBetterMediaQuery from "@/hooks/useMediaQuery";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+import SettingsDialog from "@/components/ui/settings";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import useBetterMediaQuery from "@/hooks/useMediaQuery";
+import { createClient } from "@/lib/supabase/client";
+import { cn, isDarkTheme } from "@/lib/utils";
+import { useAuth } from "@/providers/auth-provider";
+import { AnimatePresence, m as motion, MotionConfig } from "framer-motion";
 import {
-  Home,
-  Sword,
-  Users,
   BookOpen,
-  Map,
-  Star,
-  Settings,
-  HelpCircle,
-  ChevronLeft,
-  ChevronRight,
   Castle,
+  ChevronRight,
+  HelpCircle,
+  Home,
+  Loader,
+  LogOut,
+  Settings,
+  Skull,
   Swords,
   Target,
-  LogOut,
-  Menu,
-  Loader,
-  Skull,
 } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import SettingsDialog from "@/components/ui/settings";
-import { signInWithDiscord, signOut } from "@/app/actions/auth";
-import { useAuth } from "@/providers/auth-provider";
-import { createClient } from "@/lib/supabase/client";
-import { isDarkTheme } from "@/lib/utils";
+import { useTheme } from "next-themes";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React, { useEffect, useMemo, useState } from "react";
 
 type SidebarOption = {
   icon: React.ElementType;

@@ -1,11 +1,11 @@
 "use client";
-import React, { useState } from "react";
-import { useAuth } from "@/providers/auth-provider";
 import { signInWithDiscord } from "@/app/actions/auth";
-import { usePathname } from "next/navigation";
 import GenericSubmitTeamModal from "@/components/base/generic-submit-team-modal";
-import InterceptionSubmitTeam from "./interception-submit-team";
 import { Tables } from "@/lib/types/database.types";
+import { useAuth } from "@/providers/auth-provider";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import InterceptionSubmitTeam from "./interception-submit-team";
 
 interface InterceptionSubmitTeamModalProps {
   modeId: string;
