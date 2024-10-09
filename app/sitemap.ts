@@ -1,6 +1,6 @@
-import type { MetadataRoute } from "next";
-import { getURL } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
+import { getURL } from "@/lib/utils";
+import type { MetadataRoute } from "next";
 
 async function getManufacturerSites(): Promise<MetadataRoute.Sitemap> {
   const supabase = createClient();
@@ -57,6 +57,27 @@ async function getInterceptionSites(): Promise<MetadataRoute.Sitemap> {
     .from("bosses")
     .select("slug")
     .eq("mode_type", "Interception");
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data.map(({ slug }) => ({
+    url: getURL(`/interception/${slug}`),
+    lastModified: new Date(),
+    changeFrequency: "daily",
+    priority: 0.8,
+  }));
+}
+
+async function getAnomalyInterceptionSites(): Promise<MetadataRoute.Sitemap> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("bosses")
+    .select("slug")
+    .eq("mode_type", "Anomaly Interception");
 
   if (error) {
     console.error(error);

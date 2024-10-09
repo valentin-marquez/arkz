@@ -5,6 +5,7 @@ import Timer from "@/components/ui/timer";
 import TwitterTimeline from "@/components/ui/twitter-timeline";
 import Image from "next/image";
 import React from "react";
+import Wallpaper from "../../public/Images/landing-wallpaper.png";
 
 const Home: React.FC = () => {
   return (
@@ -14,7 +15,7 @@ const Home: React.FC = () => {
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
-            src="/images/landing-wallpaper.png"
+            src={Wallpaper}
             alt="Landing Background"
             fill
             style={{ objectFit: "cover", objectPosition: "center" }}
