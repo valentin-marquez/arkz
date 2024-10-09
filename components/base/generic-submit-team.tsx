@@ -1,19 +1,18 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import DynamicFilterInput from "@/components/ui/DynamicFilterInput";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Search, Eye, EyeOff } from "lucide-react";
-import Image from "next/image";
-import { m as motion } from "framer-motion";
+import { Textarea } from "@/components/ui/textarea";
 import { useCharacterStore } from "@/lib/store/character-store";
 import { useTeamStore } from "@/lib/store/team-store";
 import { getMediaURL } from "@/lib/supabase/utils";
-import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
 import { Tables } from "@/lib/types/database.types";
-import MarkdownRenderer from "@/components/MarkdownRenderer";
+import { AnimatePresence, m as motion } from "framer-motion";
+import { Eye, EyeOff, Loader2, Plus } from "lucide-react";
+import Image from "next/image";
+import React, { useEffect, useState } from "react";
 
 interface GenericSubmitTeamProps<T> {
   numberOfTeams: number;
@@ -30,9 +29,9 @@ interface GenericSubmitTeamProps<T> {
   onClose: () => void;
 }
 
-const MotionButton = motion(Button);
-
 const TEAM_SIZE = 5;
+
+const MotionButton = motion(Button);
 
 export default function GenericSubmitTeam<T>({
   numberOfTeams,
@@ -41,24 +40,67 @@ export default function GenericSubmitTeam<T>({
   onSubmit,
   onClose,
 }: GenericSubmitTeamProps<T>) {
-  const { characters, setCharacters, filteredCharacters, setFilter } =
-    useCharacterStore();
+  const {
+    characters,
+    setCharacters,
+    filteredCharacters,
+    setFilter,
+    setRarities,
+    setElements,
+    setWeaponTypes,
+    setBurst,
+    setManufacturer,
+  } = useCharacterStore();
   const { teams, setTeams, addNikkeToTeam, removeNikkeFromTeam, isNikkeUsed } =
     useTeamStore();
   const [activeTeam, setActiveTeam] = useState(0);
   const [comment, setComment] = useState("");
   const [selectedVersion, setSelectedVersion] = useState(versions[0].id);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
 
   useEffect(() => {
     setTeams(Array(numberOfTeams).fill(Array(TEAM_SIZE).fill(null)));
   }, [setTeams, numberOfTeams]);
 
-  useEffect(() => {
-    setFilter(searchTerm);
-  }, [searchTerm, setFilter]);
+  const handleFilterChange = (
+    newFilters: { type: string; value: string }[],
+    newSearchTerm: string
+  ) => {
+    setFilter(newSearchTerm);
+
+    // Reset all filters
+    setRarities([]);
+    setElements([]);
+    setWeaponTypes([]);
+    setBurst(undefined);
+    setManufacturer(undefined);
+
+    // Apply new filters
+    newFilters.forEach((filter) => {
+      switch (filter.type.toLowerCase()) {
+        case "rarity":
+          setRarities([filter.value.toUpperCase()]);
+          break;
+        case "element":
+          setElements([
+            filter.value.charAt(0).toUpperCase() + filter.value.slice(1),
+          ]);
+          break;
+        case "weapon_type":
+          setWeaponTypes([filter.value.toUpperCase()]);
+          break;
+        case "burst":
+          setBurst(filter.value === "multiple" ? "Multiple" : filter.value);
+          break;
+        case "manufacturer":
+          setManufacturer(
+            filter.value.charAt(0).toUpperCase() + filter.value.slice(1)
+          );
+          break;
+      }
+    });
+  };
 
   const handleAddToTeam = (character: Tables<"nikkes">) => {
     const emptySlotIndex = teams[activeTeam].findIndex((slot) => slot === null);
@@ -179,11 +221,18 @@ export default function GenericSubmitTeam<T>({
                   )}
                 </Button>
               </div>
-              {isPreviewVisible && (
-                <div className="mt-2 p-4 border rounded-md bg-muted">
-                  <MarkdownRenderer content={comment} />
-                </div>
-              )}
+              <AnimatePresence>
+                {isPreviewVisible && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-2 p-4 border rounded-md bg-muted overflow-hidden"
+                  >
+                    <MarkdownRenderer content={comment} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
               <MotionButton
                 onClick={handleSubmit}
                 className="w-full mt-4"
@@ -205,24 +254,12 @@ export default function GenericSubmitTeam<T>({
           </div>
           <div className="lg:w-2/3 flex flex-col">
             <div className="mb-4">
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Search characters..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-                <Search
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={20}
-                />
-              </div>
+              <DynamicFilterInput onFilterChange={handleFilterChange} />
             </div>
             <ScrollArea className="flex-grow h-80 lg:h-[480px] px-1.5">
               <motion.div
                 layout
-                className="grid grid-cols-1   md:grid-cols-3 sm:grid-cols-2 gap-2 p-2"
+                className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 gap-2 p-2"
               >
                 {filteredCharacters.map((character) => (
                   <motion.div
