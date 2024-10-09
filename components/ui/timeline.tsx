@@ -6,7 +6,6 @@ import {
   ScrollBar,
 } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/lib/supabase/client";
 import { Tables } from "@/lib/types/database.types";
 import {
   addDays,
@@ -17,55 +16,24 @@ import {
   subDays,
 } from "date-fns";
 import { AnimatePresence, m as motion } from "framer-motion";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import TimelineEvent from "./timeline-event";
 
-const Timeline: React.FC = () => {
-  const [events, setEvents] = useState<Tables<"game_events">[]>([]);
-  const [loading, setLoading] = useState(true);
+interface TimelineProps {
+  initialEvents: Tables<"game_events">[];
+}
+
+const Timeline: React.FC<TimelineProps> = ({ initialEvents }) => {
+  const [events] = useState<Tables<"game_events">[]>(initialEvents);
   const [expanded, setExpanded] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const viewportRef = useRef<HTMLDivElement>(null); // Ref para el viewport
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [totalDays, setTotalDays] = useState(0);
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  useEffect(() => {
-    if (!loading && events.length > 0) {
-      const dates = calculateDates(events);
-      setStartDate(dates.startDate);
-      setTotalDays(dates.totalDays);
-      scrollToToday();
-    }
-  }, [loading, events]);
-
-  const fetchEvents = async () => {
-    const supabase = createClient();
-    const currentDate = new Date();
-    const threeDaysAgo = subDays(currentDate, 3);
-
-    const { data: eventsData, error: eventsError } = await supabase
-      .from("game_events")
-      .select("*")
-      .or(
-        `end_date.gte.${threeDaysAgo.toISOString()},and(start_date.lte.${currentDate.toISOString()},end_date.gte.${currentDate.toISOString()})`
-      )
-      .order("importance", { ascending: true })
-      .order("start_date", { ascending: true });
-
-    if (eventsError) {
-      console.error("Error fetching events:", eventsError);
-    } else {
-      setEvents(eventsData as Tables<"game_events">[]);
-    }
-    setLoading(false);
-  };
+  const viewportRef = useRef<HTMLDivElement>(null);
 
   const calculateDates = (events: Tables<"game_events">[]) => {
+    if (events.length === 0) {
+      return { startDate: new Date(), totalDays: 0 };
+    }
     const sortedEvents = events.sort((a, b) =>
       a.start_date.localeCompare(b.start_date)
     );
@@ -75,6 +43,17 @@ const Timeline: React.FC = () => {
     const totalDays = differenceInDays(endDate, startDate) + 1;
     return { startDate, totalDays };
   };
+
+  const { startDate, totalDays } = useMemo(
+    () => calculateDates(events),
+    [events]
+  );
+
+  useEffect(() => {
+    if (events.length > 0) {
+      scrollToToday();
+    }
+  }, [events, startDate]);
 
   const scrollToToday = () => {
     if (viewportRef.current) {
@@ -101,7 +80,7 @@ const Timeline: React.FC = () => {
 
   if (events.length === 0) {
     return (
-      <Card className="container mx-auto p-4 bg-background text-foreground">
+      <Card className="container mx-auto p-4 bg-muted/60 text-foreground">
         No events found
       </Card>
     );

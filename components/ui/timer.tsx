@@ -1,3 +1,4 @@
+"use client";
 import * as Progress from "@radix-ui/react-progress";
 import * as Separator from "@radix-ui/react-separator";
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -121,6 +122,8 @@ const Timer: React.FC<TimerProps> = ({
             <Progress.Root
               className={`relative overflow-hidden bg-secondary rounded-full w-full h-3 sm:h-4 ${progressBarClassName}`}
               value={progress}
+              aria-label="Progress for daily reset"
+              title="Progress for daily reset"
             >
               <Progress.Indicator
                 className="bg-primary w-full h-full transition-transform duration-[660ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)]"
